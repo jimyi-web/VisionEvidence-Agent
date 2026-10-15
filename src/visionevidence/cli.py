@@ -1,8 +1,9 @@
-"""Input validation and CPU retrieval CLI. No model inference or verification."""
+"""Input validation, CPU retrieval, and mock VLM CLI; no real inference."""
 
 import argparse
 import json
 from collections.abc import Sequence
+from dataclasses import replace
 from datetime import datetime, timezone
 import hashlib
 from pathlib import Path
@@ -16,6 +17,8 @@ from visionevidence.evaluation.retrieval import evaluate_retrieval, load_qrels
 from visionevidence.retrieval import BM25Index, evidence_to_dict, load_corpus
 from visionevidence.retrieval.bm25 import TOKENIZER
 from visionevidence.schemas import ClaimInput
+from visionevidence.vlm import BackendUnavailableError, VLMRequest, create_vlm, load_vlm_config
+from visionevidence.vlm.prompts import get_prompt
 
 
 def _bm25_options(path: Path | None) -> dict[str, float]:
@@ -87,15 +90,46 @@ def _run_retrieval(args: argparse.Namespace) -> None:
     print(serialized)
 
 
+def _run_vlm(args: argparse.Namespace) -> None:
+    config = load_vlm_config(args.config)
+    if args.backend is not None:
+        config = replace(config, backend=args.backend)
+    backend = create_vlm(config.backend, model_name=config.model_name)
+    request = VLMRequest(
+        image_path=args.vlm_image,
+        prompt=get_prompt(config.prompt_version) if args.prompt is None else args.prompt,
+        request_id=args.request_id, max_image_size_mb=config.max_image_size_mb,
+    )
+    response = backend.generate(request)
+    response.metadata.update({
+        "prompt_version": config.prompt_version if args.prompt is None else "custom",
+        "max_image_size_mb": config.max_image_size_mb,
+    })
+    if args.json:
+        print(response.to_json())
+    else:
+        # Escape arbitrary model names for Windows terminals, like other CLI paths.
+        print(f"MOCK | backend={response.backend} | model={ascii(response.model_name)} "
+              f"| is_mock={response.is_mock} | latency_ms={response.latency_ms:.3f}")
+        print(response.description)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="visionevidence",
-        description="Validate input or retrieve text evidence; model inference is not implemented.",
+        description="Real model inference is not implemented. Validate input, retrieve evidence, or run a MOCK VLM.",
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--text", help="Non-empty text claim to validate")
     parser.add_argument("--image", help="Optional path to an existing local image file")
     commands = parser.add_subparsers(dest="command")
+    vlm = commands.add_parser("vlm", help="Run the MOCK VLM interface (no real inference)")
+    vlm.add_argument("--image", dest="vlm_image", required=True, help="Local PNG, JPEG, or WEBP file")
+    vlm.add_argument("--backend", choices=("mock", "qwen3_vl"), help="Override config backend; default: mock")
+    vlm.add_argument("--config", type=Path, help="TOML [vlm] config; defaults match configs/vlm_mock.toml")
+    vlm.add_argument("--prompt", help="Custom non-empty prompt; default: English visual observation v1")
+    vlm.add_argument("--request-id", help="Optional caller-provided identifier")
+    vlm.add_argument("--json", action="store_true", help="Emit one JSON object with is_mock=true")
     for name, description in (("retrieve", "Retrieve BM25 evidence"), ("evaluate", "Evaluate retrieval against explicit qrels")):
         command = commands.add_parser(name, help=description)
         command.add_argument("--corpus", type=Path, required=True, help="UTF-8 evidence JSONL")
@@ -114,13 +148,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.command:
             if args.text is not None or args.image is not None:
-                raise ValueError("--text/--image cannot be combined with retrieval subcommands")
-            _run_retrieval(args)
+                raise ValueError("top-level --text/--image cannot be combined with subcommands; use vlm --image for VLM input")
+            if args.command == "vlm":
+                _run_vlm(args)
+            else:
+                _run_retrieval(args)
             return 0
         if args.text is None:
-            parser.error("--text is required unless using retrieve or evaluate")
+            parser.error("--text is required unless using retrieve, evaluate, or vlm")
         claim = ClaimInput(text=args.text, image_path=args.image)
-    except (TypeError, ValueError, OSError) as exc:
+    except (TypeError, ValueError, OSError, BackendUnavailableError) as exc:
         parser.error(str(exc))
 
     print(json.dumps({

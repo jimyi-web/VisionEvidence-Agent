@@ -1,0 +1,6 @@
+[vlm]
+backend = "mock"
+model_name = "mock-vlm"
+# MiB: 1 MiB = 1024 * 1024 bytes.
+max_image_size_mb = 10
+prompt_version = "visual_observation_v1"

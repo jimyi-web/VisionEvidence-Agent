@@ -4,7 +4,7 @@
 证据检索和受约束的工具调用，对文本声明及可选图片进行有证据支撑的验证，
 并通过可审计的评估与消融实验分析效果。目标里程碑为 2026 年 11 月。
 
-## 当前状态：T02 BM25 文本证据检索基线
+## 当前状态：T03-A VLM 接口与 Mock 测试
 
 已实现：
 
@@ -16,6 +16,8 @@
 - 严格 UTF-8 JSONL 证据读取、英文分词、内存 BM25 索引和稳定 Top-K 排序。
 - `retrieve` 子命令及 JSON 输出；显式 qrels 驱动的 Recall@K、MRR@K 宏平均评测。
 - 版本控制中的 BM25 配置、合成演示数据，以及包含输入 SHA-256 和环境的评测 JSON。
+- 同步 `BaseVLM` 接口、请求/响应数据契约、英文观察提示词和可注入的 `MockVLM`。
+- `vlm` CLI、TOML 配置、图片文件头/大小校验，以及明确标记 MOCK 的文本和 JSON 输出。
 
 尚未实现：真实 VLM 推理、图片解码、稠密/混合检索、Agent 决策、
 验证预测、真实数据集接入及演示界面。当前没有模型效果或 GPU 性能实验结果。
@@ -50,7 +52,8 @@
 
 安装也会生成 `.\.venv\Scripts\visionevidence.exe` 命令入口。
 CLI 成功校验返回退出码 0；缺失参数、空声明、图片路径不存在或指向目录返回 2。
-图片目前只检查文件路径，不读取内容或验证图片编码。校验成功不表示声明为真，
+原有 `--text ... --image ...` 路径只检查文件路径，不读取内容或验证图片编码。
+新 `vlm --image ...` 子命令另行检查文件头、扩展名和大小。校验成功不表示声明为真，
 原有输入校验路径不输出预测标签或检索证据。检索子命令输出匹配证据，
 不输出事实核验标签；BM25 分数不是概率或真实性置信度。
 
@@ -71,16 +74,35 @@ CLI 成功校验返回退出码 0；缺失参数、空声明、图片路径不�
 Recall@3 = 0.75、MRR@3 = 0.75；仅证明演示链路可复现，不代表真实检索质量。
 格式、边界行为、公式和 Dense Retrieval 对比计划见 [检索基线说明](docs/retrieval_baseline.md)。
 
+## VLM Mock 演示（T03-A）
+
+`examples/vlm_demo_fixture.png` 是 69 字节、1×1 白色像素的 **synthetic/demo fixture**，
+仅用于验证接口，不是真实场景或研究证据。Mock 不分析图片，不从文件名推断内容。
+
+```powershell
+.\.venv\Scripts\python.exe -m visionevidence.cli vlm --image examples/vlm_demo_fixture.png --backend mock
+.\.venv\Scripts\python.exe -m visionevidence.cli vlm --image examples/vlm_demo_fixture.png --config configs/vlm_mock.toml --request-id demo-1 --json
+.\.venv\Scripts\python.exe -m pytest
+```
+
+安装后的入口同样支持 `.\.venv\Scripts\visionevidence.exe vlm --image ... --backend mock`。
+文本包含 `[MOCK]`；JSON 包含 `backend: "mock"`、`is_mock: true` 和
+`metadata.inference_performed: false`。内容固定，实际调用耗时会变化。
+`qwen3_vl` 明确报尚未实现，退出码 2，不加载模型或访问 GPU/网络。
+接口、配置、输入安全限制及未来接入位置见 [VLM 接口说明](docs/vlm_interface.md)。
+
 ## 工程结构
 
 ```text
 configs/base.yaml           后续配置模板（T01 不加载）
 configs/retrieval_bm25.toml  可由 --config 加载的 BM25 配置
+configs/vlm_mock.toml       Mock 后端、模型名称、大小上限与提示词版本
 docs/architecture.md        模块边界、数据契约与数据流
 docs/retrieval_baseline.md  BM25 协议、格式、复现命令与局限
-examples/                  synthetic/demo 证据及 qrels
+docs/vlm_interface.md       VLM 契约、Mock 测试与真实推理边界
+examples/                  synthetic/demo 证据、qrels 与图片 fixture
 src/visionevidence/         Python 包、数据结构与 CLI
-  vlm/                     模型加载和推理预留模块
+  vlm/                     VLM 契约、Mock、提示词及后端工厂
   retrieval/               JSONL 读取、分词和 BM25 索引
   agent/                   工具编排预留模块
   verification/            验证决策预留模块
@@ -106,9 +128,9 @@ outputs/                   本地输出目录（只跟踪 .gitkeep）
 当前固定直接开发依赖和构建依赖，尚未提供跨平台传递依赖锁文件。
 不要覆盖已有实验输出。密钥、原始数据、模型权重、环境和临时输出不得提交。
 
-未来将先在独立 Ubuntu GPU 环境验证 Qwen3-VL-4B 或其他合适的开放权重模型兼容性，
+未来将先在独立 Ubuntu GPU 环境验证 Qwen3-VL-4B-Instruct 或其他合适的开放权重模型兼容性，
 支持可配置模型路径、适用时的 BF16、复用模型实例，并实测延迟和峰值显存；
 仅必要时评估 4-bit 量化。不预先承诺任何模型能装入特定显卡。
 云实例操作、大型权重下载和 GPU 花费需要开发者明确批准。
-Windows `.venv` 不复制到 Linux。T01 不安装 PyTorch、Transformers 或 CUDA，
+Windows `.venv` 不复制到 Linux。T03-A 不安装 PyTorch、Transformers 或 CUDA，
 也不连接 GPU 服务器。
