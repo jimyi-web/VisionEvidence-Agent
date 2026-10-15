@@ -1,0 +1,16 @@
+# Planning template only. The T01 CLI does not load this file.
+project:
+  name: VisionEvidence-Agent
+  stage: T01
+reproducibility:
+  seed: 42
+paths:
+  output_dir: outputs
+vlm:
+  enabled: false
+  model_path: null
+  model_revision: null
+retrieval:
+  enabled: false
+agent:
+  enabled: false

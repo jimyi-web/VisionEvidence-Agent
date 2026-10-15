@@ -4,6 +4,12 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
+*.egg-info/
+build/
+dist/
+.coverage
+htmlcov/
+.ruff_cache/
 
 # IDE
 .idea/
@@ -15,6 +21,8 @@ venv/
 !.env.example
 *.pem
 *.key
+secrets/
+credentials*.json
 
 # Large files
 *.pt
@@ -23,10 +31,17 @@ venv/
 *.safetensors
 *.bin
 *.gguf
+*.onnx
+*.h5
+*.hdf5
 
 # Local datasets and outputs
 data/raw/
 data/processed/
-outputs/
+outputs/*
+!outputs/.gitkeep
 checkpoints/
 models/
+tmp/
+*.tmp
+*.log
