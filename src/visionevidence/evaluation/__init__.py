@@ -1,1 +1,1 @@
-"""Reserved for future reproducible evaluation; not implemented in T01."""
+"""Reproducible retrieval evaluation; no verification predictions are evaluated."""

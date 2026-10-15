@@ -4,7 +4,7 @@
 证据检索和受约束的工具调用，对文本声明及可选图片进行有证据支撑的验证，
 并通过可审计的评估与消融实验分析效果。目标里程碑为 2026 年 11 月。
 
-## 当前状态：T01 基础工程
+## 当前状态：T02 BM25 文本证据检索基线
 
 已实现：
 
@@ -13,9 +13,12 @@
 - 非空文本、图片文件路径、证据字段、有限数值分数及基本元数据校验。
 - CLI 的 `--help`、`--version` 和输入校验；JSON 输出明确包含 `inference_performed: false`。
 - CPU 单元测试与 CLI 子进程测试。
+- 严格 UTF-8 JSONL 证据读取、英文分词、内存 BM25 索引和稳定 Top-K 排序。
+- `retrieve` 子命令及 JSON 输出；显式 qrels 驱动的 Recall@K、MRR@K 宏平均评测。
+- 版本控制中的 BM25 配置、合成演示数据，以及包含输入 SHA-256 和环境的评测 JSON。
 
-尚未实现：真实 VLM 推理、图片解码、BM25/稠密/混合检索、Agent 决策、
-验证预测、数据集接入、评估指标及演示界面。当前没有模型效果或 GPU 性能实验结果。
+尚未实现：真实 VLM 推理、图片解码、稠密/混合检索、Agent 决策、
+验证预测、真实数据集接入及演示界面。当前没有模型效果或 GPU 性能实验结果。
 `configs/base.yaml` 仅为后续配置模板，当前 CLI 不加载它。
 
 ## 本地安装（Windows / PowerShell）
@@ -48,19 +51,40 @@
 安装也会生成 `.\.venv\Scripts\visionevidence.exe` 命令入口。
 CLI 成功校验返回退出码 0；缺失参数、空声明、图片路径不存在或指向目录返回 2。
 图片目前只检查文件路径，不读取内容或验证图片编码。校验成功不表示声明为真，
-CLI 不输出预测标签或检索证据。结果数据结构供未来模块使用，不包含默认预测。
+原有输入校验路径不输出预测标签或检索证据。检索子命令输出匹配证据，
+不输出事实核验标签；BM25 分数不是概率或真实性置信度。
+
+## CPU 检索与评测演示
+
+以下文件均为 **synthetic/demo 合成数据**，不是真实新闻或事实证据。
+不安装 rank-bm25：该基线由 Python 标准库实现，保持运行时零第三方依赖。
+
+```powershell
+.\.venv\Scripts\python.exe -m visionevidence.cli retrieve --query "flood road closures" --corpus examples/evidence_demo.jsonl --top-k 3 --config configs/retrieval_bm25.toml
+.\.venv\Scripts\python.exe -m visionevidence.cli retrieve --query "flood road closures" --corpus examples/evidence_demo.jsonl --top-k 3 --json
+.\.venv\Scripts\python.exe -m visionevidence.cli evaluate --corpus examples/evidence_demo.jsonl --qrels examples/qrels_demo.jsonl --top-k 3 --config configs/retrieval_bm25.toml --dataset-name synthetic/demo --dataset-version 1 --split demo --output outputs/retrieval-demo.json
+```
+
+也可使用 `.\.venv\Scripts\visionevidence.exe retrieve ...`。评测输出始终为 JSON；
+`--output` 使用独占创建，已存在时返回错误，请为新运行选择新文件名。
+演示共 5 个查询，4 个参与评测、1 个无标注而排除。确定性结果为
+Recall@3 = 0.75、MRR@3 = 0.75；仅证明演示链路可复现，不代表真实检索质量。
+格式、边界行为、公式和 Dense Retrieval 对比计划见 [检索基线说明](docs/retrieval_baseline.md)。
 
 ## 工程结构
 
 ```text
 configs/base.yaml           后续配置模板（T01 不加载）
+configs/retrieval_bm25.toml  可由 --config 加载的 BM25 配置
 docs/architecture.md        模块边界、数据契约与数据流
+docs/retrieval_baseline.md  BM25 协议、格式、复现命令与局限
+examples/                  synthetic/demo 证据及 qrels
 src/visionevidence/         Python 包、数据结构与 CLI
   vlm/                     模型加载和推理预留模块
-  retrieval/               证据检索预留模块
+  retrieval/               JSONL 读取、分词和 BM25 索引
   agent/                   工具编排预留模块
   verification/            验证决策预留模块
-  evaluation/              评估预留模块
+  evaluation/              qrels 校验、Recall@K 和 MRR@K
 scripts/                   后续可复现脚本目录
 tests/                     数据结构与 CLI 测试
 outputs/                   本地输出目录（只跟踪 .gitkeep）

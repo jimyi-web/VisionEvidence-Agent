@@ -1,0 +1,5 @@
+{"evidence_id":"E001","text":"Heavy rainfall caused flood damage and road closures.","source":"synthetic/demo","metadata":{"synthetic":true,"dataset_version":"1","note":"虚构演示文本，不是真实新闻"}}
+{"evidence_id":"E002","text":"Road closures followed the flood near the river.","source":"synthetic/demo","metadata":{"synthetic":true,"dataset_version":"1"}}
+{"evidence_id":"E003","text":"The library opened a new reading room.","source":"synthetic/demo","metadata":{"synthetic":true,"dataset_version":"1"}}
+{"evidence_id":"E004","text":"A bridge inspection delayed road traffic.","source":"synthetic/demo","metadata":{"synthetic":true,"dataset_version":"1"}}
+{"evidence_id":"E005","text":"The observatory recorded a meteor shower.","source":"synthetic/demo","metadata":{"synthetic":true,"dataset_version":"1"}}
