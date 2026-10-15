@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Large files
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.gguf
+
+# Local datasets and outputs
+data/raw/
+data/processed/
+outputs/
+checkpoints/
+models/
