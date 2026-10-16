@@ -1,0 +1,9 @@
+# Install only in the separate Linux GPU venv, after the exact cu128 PyTorch pair.
+# Constraints prevent selecting other versions; inspect the dry-run plan first.
+# pip can replace preinstalled packages: stop if the existing pair differs.
+-c gpu-constraints.txt
+transformers==4.57.1
+accelerate==1.10.1
+huggingface-hub==0.35.3
+Pillow==11.3.0
+torchvision==0.23.0+cu128

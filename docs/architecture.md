@@ -1,4 +1,4 @@
-# Architecture — T03-A
+# Architecture — T03-B-1
 
 ## 当前执行路径
 
@@ -10,11 +10,16 @@ T02 新增两条独立 CPU 路径：
 - `evaluate` → 同一索引 + 独立 qrels → 逐查询检索 → Recall@K/MRR@K 宏平均 → 可审计 JSON。
 
 旧输入校验命令及 `--help`、`--version` 保持兼容；禁止将 `--text/--image`
-与子命令混用；VLM 图片参数放在 `vlm` 后面。当前不调用真实模型、网络搜索、Agent 或验证决策。
+与子命令混用；VLM 图片参数放在 `vlm` 后面。旧路径不调用真实模型、网络搜索、Agent 或验证决策。
 
 T03-A 增加独立路径：`vlm` → TOML 配置/后端选择 → `VLMRequest` 校验
-→ `BaseVLM.generate`（当前仅 MockVLM）→ `VLMResponse` → MOCK 文本或 JSON。
+→ `BaseVLM.generate` → `VLMResponse` → 明确后端标识的文本或 JSON。
 该路径尚未与检索、Agent 或验证逻辑串联。
+
+T03-B-1 增加显式 `qwen3_vl` 分支：本地目录预检 → Pillow 完整解码/EXIF/RGB/尺寸约束
+→ 首次加载并复用 Qwen3VLForConditionalGeneration 与 AutoProcessor → 单 GPU BF16 生成
+→ 裁剪输入 token → 未验证描述与运行元数据。GPU 框架延迟导入，Mock 和检索不依赖它们。
+真实 CUDA 路径尚待云端验收，CPU fake 测试不代表真实推理已成功。
 
 CLI 使用 argparse；数据契约使用 dataclass、pathlib 等标准库组件。
 输入文本去除首尾空白后必须非空。图片可省略；提供时必须指向现有文件，
@@ -51,7 +56,7 @@ VLM 数据结构独立放在 `vlm/schemas.py`，不修改 T01 契约；VLM datac
 
 | 模块 | 计划职责 |
 | --- | --- |
-| `vlm` | 已实现同步 Protocol、请求/响应校验、Mock、英文提示词和工厂；真实模型加载、推理与显存记录未实现 |
+| `vlm` | 已实现同步 Protocol、Mock、提示词、工厂和本地 Qwen3-VL 加载/推理/统计逻辑；真实 GPU 执行尚未验证 |
 | `retrieval` | 已实现 JSONL 校验、英文分词、BM25 和稳定排序；稠密/混合检索尚未实现 |
 | `agent` | 受约束工具选择；显式接口、调用上限、超时、停止条件和中间记录 |
 | `verification` | 基于输入及证据产生结果，检查引用，按数据集协议解释标签 |
@@ -75,6 +80,8 @@ BM25 索引只接收证据，`search` 只接收查询和 K，不接受相关性�
   未提供 `--config` 时使用相同默认值 k1=1.5、b=0.75，实际参数写入结果。
 - `configs/vlm_mock.toml` 通过 `tomllib` 严格读取；未提供路径时使用相同内置默认值。
   `--backend` 覆盖后端配置，`--prompt` 覆盖提示词并将实际提示词版本标记为 custom。
+- `configs/vlm_qwen3_vl.toml` 配置本地权重、单 GPU、BF16、生成长度及像素/尺寸上限。
+  GPU 依赖独立放在 `requirements/`；模型和处理器均 local_files_only，不自动下载或降级 Mock。
 - `scripts/` 为后续可复现脚本预留，`.gitkeep` 保留空目录；当前复现命令见 README。
 - `outputs/` 用于本地产物，只有 `.gitkeep` 进入 Git；实验需各自独立目录以避免覆盖。
 - T02 只执行本地文本检索与检索评测，不进行模型调用、网络检索或 GPU 操作。
@@ -96,3 +103,7 @@ T03-A 增加图片校验、JSON 安全性、Mock 内容确定性与接口注入�
 独立 Python 子进程在导入 VLM 前拦截网络、GPU 框架导入与外部进程调用，验证 Mock 路径。
 69 字节 PNG demo fixture 另验证完整 chunk CRC 与解压后的像素，避免把伪造文件当示例图片。
 更多细节见 [VLM 接口说明](vlm_interface.md)。
+
+T03-B-1 使用真实 Pillow 和注入的 torch/processor/model doubles 验证图片、加载复用、
+CUDA/BF16 预检、token 裁剪、计时口径、失败传播和真实后端 CLI 输出契约。
+部署与尚未验证事项见 [Qwen3-VL 部署说明](qwen3_vl_deployment.md)。

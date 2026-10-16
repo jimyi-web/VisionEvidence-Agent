@@ -4,7 +4,7 @@
 证据检索和受约束的工具调用，对文本声明及可选图片进行有证据支撑的验证，
 并通过可审计的评估与消融实验分析效果。目标里程碑为 2026 年 11 月。
 
-## 当前状态：T03-A VLM 接口与 Mock 测试
+## 当前状态：T03-B-1 Qwen3-VL 后端开发（GPU 待验收）
 
 已实现：
 
@@ -18,8 +18,10 @@
 - 版本控制中的 BM25 配置、合成演示数据，以及包含输入 SHA-256 和环境的评测 JSON。
 - 同步 `BaseVLM` 接口、请求/响应数据契约、英文观察提示词和可注入的 `MockVLM`。
 - `vlm` CLI、TOML 配置、图片文件头/大小校验，以及明确标记 MOCK 的文本和 JSON 输出。
+- 可选的本地 Qwen3-VL 后端：单 GPU BF16、模型复用、完整图片解码、生成 token 裁剪、耗时与显存元数据。
+- GPU 依赖文件和分步部署文档；后端控制流由 CPU 模拟运行库测试覆盖。
 
-尚未实现：真实 VLM 推理、图片解码、稠密/混合检索、Agent 决策、
+尚未验证：真实 GPU 模型加载、推理结果、耗时与显存。尚未实现稠密/混合检索、Agent 决策、
 验证预测、真实数据集接入及演示界面。当前没有模型效果或 GPU 性能实验结果。
 `configs/base.yaml` 仅为后续配置模板，当前 CLI 不加载它。
 
@@ -35,7 +37,7 @@
 .\.venv\Scripts\python.exe -m pip check
 ```
 
-运行时无第三方依赖。开发依赖为 pytest，构建使用 setuptools；直接依赖版本在
+基础运行路径无第三方依赖。开发依赖为 pytest 和图片解码测试使用的 Pillow，构建使用 setuptools；直接依赖版本在
 `pyproject.toml` 中固定。安装需要能够访问相应 Python 包索引。
 当前验证目标是 Python 3.12，其他版本尚未验证。
 
@@ -88,8 +90,23 @@ Recall@3 = 0.75、MRR@3 = 0.75；仅证明演示链路可复现，不代表真�
 安装后的入口同样支持 `.\.venv\Scripts\visionevidence.exe vlm --image ... --backend mock`。
 文本包含 `[MOCK]`；JSON 包含 `backend: "mock"`、`is_mock: true` 和
 `metadata.inference_performed: false`。内容固定，实际调用耗时会变化。
-`qwen3_vl` 明确报尚未实现，退出码 2，不加载模型或访问 GPU/网络。
-接口、配置、输入安全限制及未来接入位置见 [VLM 接口说明](docs/vlm_interface.md)。
+`qwen3_vl` 必须配置现有本地模型目录和独立 GPU 环境；目录缺失时退出码 2，不下载权重。
+接口、配置与输入安全限制见 [VLM 接口说明](docs/vlm_interface.md)。
+
+## Qwen3-VL 后端（T03-B-1）
+
+完成云端人工部署后可运行：
+
+```bash
+visionevidence vlm --image /path/to/image.jpg --backend qwen3_vl --config configs/vlm_qwen3_vl.toml --json
+```
+
+配置中的 model_path 默认位于 AutoDL 数据盘，支持修改。真实后端输出 `backend=qwen3_vl`、
+`is_mock=false`、`inference_performed=true`，但始终 `verified=false`。
+采用官方 Qwen3VLForConditionalGeneration + AutoProcessor，固定 Transformers 4.57.1，
+模型/处理器仅从本地加载；不修改 BaseVLM.generate 接口，不连接检索与验证逻辑。
+依赖依据、独立环境、下载、显存/耗时口径和 OOM 处理见
+[云端部署与人工验收](docs/qwen3_vl_deployment.md)。这些云端步骤尚未在本任务执行。
 
 ## 工程结构
 
@@ -97,9 +114,12 @@ Recall@3 = 0.75、MRR@3 = 0.75；仅证明演示链路可复现，不代表真�
 configs/base.yaml           后续配置模板（T01 不加载）
 configs/retrieval_bm25.toml  可由 --config 加载的 BM25 配置
 configs/vlm_mock.toml       Mock 后端、模型名称、大小上限与提示词版本
+configs/vlm_qwen3_vl.toml    本地权重路径、单 GPU BF16 与生成/图片限制
+requirements/              独立 GPU 依赖和 PyTorch 版本约束
 docs/architecture.md        模块边界、数据契约与数据流
 docs/retrieval_baseline.md  BM25 协议、格式、复现命令与局限
 docs/vlm_interface.md       VLM 契约、Mock 测试与真实推理边界
+docs/qwen3_vl_deployment.md  AutoDL 分步部署与待完成的 GPU 验收
 examples/                  synthetic/demo 证据、qrels 与图片 fixture
 src/visionevidence/         Python 包、数据结构与 CLI
   vlm/                     VLM 契约、Mock、提示词及后端工厂
@@ -128,9 +148,9 @@ outputs/                   本地输出目录（只跟踪 .gitkeep）
 当前固定直接开发依赖和构建依赖，尚未提供跨平台传递依赖锁文件。
 不要覆盖已有实验输出。密钥、原始数据、模型权重、环境和临时输出不得提交。
 
-未来将先在独立 Ubuntu GPU 环境验证 Qwen3-VL-4B-Instruct 或其他合适的开放权重模型兼容性，
-支持可配置模型路径、适用时的 BF16、复用模型实例，并实测延迟和峰值显存；
+下一步需在独立 Ubuntu GPU 环境验证 Qwen3-VL-4B-Instruct 的实际兼容性，
+核验本地加载、BF16、模型复用，并实测延迟和峰值显存；
 仅必要时评估 4-bit 量化。不预先承诺任何模型能装入特定显卡。
 云实例操作、大型权重下载和 GPU 花费需要开发者明确批准。
-Windows `.venv` 不复制到 Linux。T03-A 不安装 PyTorch、Transformers 或 CUDA，
-也不连接 GPU 服务器。
+Windows `.venv` 不复制到 Linux。CPU 开发和测试无需安装 PyTorch、Transformers 或 CUDA，
+本次开发未连接 GPU 服务器。

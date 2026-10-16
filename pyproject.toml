@@ -11,7 +11,7 @@ requires-python = ">=3.12"
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest==8.3.5"]
+dev = ["pytest==8.3.5", "Pillow==11.3.0"]
 
 [project.scripts]
 visionevidence = "visionevidence.cli:main"

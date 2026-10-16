@@ -1,4 +1,4 @@
-"""Input validation, CPU retrieval, and mock VLM CLI; no real inference."""
+"""Input validation, CPU retrieval, and explicit Mock/local Qwen3-VL CLI."""
 
 import argparse
 import json
@@ -17,7 +17,7 @@ from visionevidence.evaluation.retrieval import evaluate_retrieval, load_qrels
 from visionevidence.retrieval import BM25Index, evidence_to_dict, load_corpus
 from visionevidence.retrieval.bm25 import TOKENIZER
 from visionevidence.schemas import ClaimInput
-from visionevidence.vlm import BackendUnavailableError, VLMRequest, create_vlm, load_vlm_config
+from visionevidence.vlm import BackendUnavailableError, VLMInferenceError, VLMRequest, create_vlm, load_vlm_config
 from visionevidence.vlm.prompts import get_prompt
 
 
@@ -94,7 +94,7 @@ def _run_vlm(args: argparse.Namespace) -> None:
     config = load_vlm_config(args.config)
     if args.backend is not None:
         config = replace(config, backend=args.backend)
-    backend = create_vlm(config.backend, model_name=config.model_name)
+    backend = create_vlm(config.backend, config=config)
     request = VLMRequest(
         image_path=args.vlm_image,
         prompt=get_prompt(config.prompt_version) if args.prompt is None else args.prompt,
@@ -109,7 +109,8 @@ def _run_vlm(args: argparse.Namespace) -> None:
         print(response.to_json())
     else:
         # Escape arbitrary model names for Windows terminals, like other CLI paths.
-        print(f"MOCK | backend={response.backend} | model={ascii(response.model_name)} "
+        label = "MOCK" if response.is_mock else "REAL (unverified model output)"
+        print(f"{label} | backend={response.backend} | model={ascii(response.model_name)} "
               f"| is_mock={response.is_mock} | latency_ms={response.latency_ms:.3f}")
         print(response.description)
 
@@ -117,19 +118,19 @@ def _run_vlm(args: argparse.Namespace) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="visionevidence",
-        description="Real model inference is not implemented. Validate input, retrieve evidence, or run a MOCK VLM.",
+        description="Validate input, retrieve evidence, or run a MOCK/local Qwen3-VL backend.",
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--text", help="Non-empty text claim to validate")
     parser.add_argument("--image", help="Optional path to an existing local image file")
     commands = parser.add_subparsers(dest="command")
-    vlm = commands.add_parser("vlm", help="Run the MOCK VLM interface (no real inference)")
+    vlm = commands.add_parser("vlm", help="Run a MOCK or local Qwen3-VL backend")
     vlm.add_argument("--image", dest="vlm_image", required=True, help="Local PNG, JPEG, or WEBP file")
     vlm.add_argument("--backend", choices=("mock", "qwen3_vl"), help="Override config backend; default: mock")
     vlm.add_argument("--config", type=Path, help="TOML [vlm] config; defaults match configs/vlm_mock.toml")
     vlm.add_argument("--prompt", help="Custom non-empty prompt; default: English visual observation v1")
     vlm.add_argument("--request-id", help="Optional caller-provided identifier")
-    vlm.add_argument("--json", action="store_true", help="Emit one JSON object with is_mock=true")
+    vlm.add_argument("--json", action="store_true", help="Emit one JSON object with explicit backend/is_mock metadata")
     for name, description in (("retrieve", "Retrieve BM25 evidence"), ("evaluate", "Evaluate retrieval against explicit qrels")):
         command = commands.add_parser(name, help=description)
         command.add_argument("--corpus", type=Path, required=True, help="UTF-8 evidence JSONL")
@@ -157,7 +158,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.text is None:
             parser.error("--text is required unless using retrieve, evaluate, or vlm")
         claim = ClaimInput(text=args.text, image_path=args.image)
-    except (TypeError, ValueError, OSError, BackendUnavailableError) as exc:
+    except (TypeError, ValueError, OSError, BackendUnavailableError, VLMInferenceError) as exc:
         parser.error(str(exc))
 
     print(json.dumps({

@@ -47,7 +47,7 @@ def test_vlm_custom_prompt() -> None:
     (["vlm"], "required"),
     (["vlm", "--image", "missing-vlm-fixture.png"], "existing regular file"),
     (["vlm", "--image", IMAGE, "--prompt", " "], "prompt must not be empty"),
-    (["vlm", "--image", IMAGE, "--backend", "qwen3_vl"], "not implemented"),
+    (["vlm", "--image", IMAGE, "--backend", "qwen3_vl"], "model_path"),
     (["vlm", "--image", IMAGE, "--backend", "other"], "invalid choice"),
     (["vlm", "--image", IMAGE, "--config", "missing-vlm-config.toml"], "invalid VLM config"),
     (["--text", "claim", "vlm", "--image", IMAGE], "cannot be combined"),
@@ -76,7 +76,7 @@ def test_vlm_cli_config_values_and_override(tmp_path: Path) -> None:
     config.write_text(Path(CONFIG).read_text().replace('backend = "mock"', 'backend = "qwen3_vl"')
                       .replace('model_name = "mock-vlm"', 'model_name = "custom-mock"'), encoding="utf-8")
     result = run_cli("vlm", "--image", IMAGE, "--config", str(config))
-    assert result.returncode == 2 and "not implemented" in result.stderr
+    assert result.returncode == 2 and "model_path" in result.stderr
     overridden = run_cli("vlm", "--image", IMAGE, "--config", str(config), "--backend", "mock", "--json")
     assert overridden.returncode == 0, overridden.stderr
     assert json.loads(overridden.stdout)["model_name"] == "custom-mock"

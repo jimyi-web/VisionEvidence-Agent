@@ -10,7 +10,7 @@ import zlib
 import pytest
 
 from visionevidence.vlm import (
-    BackendUnavailableError, BaseVLM, MockVLM, VLMConfig, VLMRequest,
+    BaseVLM, MockVLM, VLMConfig, VLMRequest,
     VLMResponse, create_vlm, load_vlm_config,
 )
 from visionevidence.vlm.prompts import PROMPT_VERSION, get_prompt
@@ -261,7 +261,7 @@ def test_factory_and_default_config() -> None:
     assert isinstance(create_vlm("mock"), MockVLM)
     assert create_vlm("mock", model_name="custom-mock").model_name == "custom-mock"
     assert load_vlm_config(ROOT / "configs/vlm_mock.toml") == load_vlm_config() == VLMConfig()
-    with pytest.raises(BackendUnavailableError, match="not implemented"):
+    with pytest.raises(ValueError, match="model_path"):
         create_vlm("qwen3_vl")
     with pytest.raises(ValueError, match="unsupported backend"):
         create_vlm("unknown")

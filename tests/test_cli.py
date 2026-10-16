@@ -24,7 +24,7 @@ def test_help() -> None:
     assert result.returncode == 0
     assert "--text" in result.stdout
     assert "--image" in result.stdout
-    assert "inference is not implemented" in result.stdout
+    assert "Qwen3-VL" in result.stdout
 
 
 def test_version() -> None:
