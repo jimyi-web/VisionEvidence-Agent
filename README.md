@@ -1,5 +1,14 @@
 # VisionEvidence-Agent
 
+T04-4 固定合成样本检索评测（Windows CPU，无 VLM 调用）：
+
+```powershell
+.\.venv\Scripts\python.exe -m visionevidence.evaluation.observation --dataset data/evaluation/t04_v1 --config configs/t04_evaluation.toml --output outputs/t04-4-replay-01
+```
+
+每次使用新输出目录，禁止覆盖。目录内保存数据/配置快照、manifest.json、summary.json 和包含两组逐样本候选全文、分数及诊断的 results.jsonl。
+评测定义与数据偏差见 [协议](docs/t04_4_protocol.md)，实测结果与限制见 [报告](docs/t04_4_report.md)。
+
 一个轻量、可复现的多模态证据验证研究项目。研究目标是结合视觉语言模型、
 证据检索和受约束的工具调用，对文本声明及可选图片进行有证据支撑的验证，
 并通过可审计的评估与消融实验分析效果。目标里程碑为 2026 年 11 月。

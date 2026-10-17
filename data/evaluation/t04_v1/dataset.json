@@ -1,0 +1,14 @@
+{
+  "name": "t04-synthetic-observation-retrieval",
+  "version": "1.0.0",
+  "split": "synthetic_test",
+  "author": "Codex",
+  "human_reviewed": false,
+  "synthetic": true,
+  "real_images": false,
+  "real_vlm_outputs": false,
+  "mock_vlm_called": false,
+  "sample_count": 10,
+  "document_count": 12,
+  "construction": "Authored scene descriptions; extractive structured fields, retained omissions and language/synonym limitations. Fictional closed corpus and relevance rationales. See docs/t04_4_protocol.md."
+}

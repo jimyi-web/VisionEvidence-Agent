@@ -1,0 +1,12 @@
+{"evidence_id": "D01", "text": "A red bus waits beside a bus stop marked Route 12.", "source": "synthetic://t04_v1/D01", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D02", "text": "The Route 12 bus stop has a red bus at the sign.", "source": "synthetic://t04_v1/D02", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D03", "text": "A bicycle stands beside a river bridge with a Bridge closed sign.", "source": "synthetic://t04_v1/D03", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D04", "text": "A river bridge has a Bridge open sign and no bicycle.", "source": "synthetic://t04_v1/D04", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D05", "text": "The library entrance displays Open Sunday.", "source": "synthetic://t04_v1/D05", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D06", "text": "The library entrance displays Closed Sunday.", "source": "synthetic://t04_v1/D06", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D07", "text": "A train platform marked Platform 7 has a suitcase.", "source": "synthetic://t04_v1/D07", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D08", "text": "A train platform marked Platform 2 has a suitcase.", "source": "synthetic://t04_v1/D08", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D09", "text": "A dog stands beside a fountain labelled Drinking water.", "source": "synthetic://t04_v1/D09", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D10", "text": "A decorative fountain beside a garden has a No drinking notice.", "source": "synthetic://t04_v1/D10", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D11", "text": "car", "source": "synthetic://t04_v1/D11", "metadata": {"synthetic": true, "human_reviewed": false}}
+{"evidence_id": "D12", "text": "A blue bus at a bus stop displays Route 9.", "source": "synthetic://t04_v1/D12", "metadata": {"synthetic": true, "human_reviewed": false}}
