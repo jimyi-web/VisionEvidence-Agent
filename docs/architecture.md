@@ -19,7 +19,7 @@ T03-A 增加独立路径：`vlm` → TOML 配置/后端选择 → `VLMRequest` �
 T03-B-1 增加显式 `qwen3_vl` 分支：本地目录预检 → Pillow 完整解码/EXIF/RGB/尺寸约束
 → 首次加载并复用 Qwen3VLForConditionalGeneration 与 AutoProcessor → 单 GPU BF16 生成
 → 裁剪输入 token → 未验证描述与运行元数据。GPU 框架延迟导入，Mock 和检索不依赖它们。
-真实 CUDA 路径尚待云端验收，CPU fake 测试不代表真实推理已成功。
+真实 CUDA 路径已完成 T03-B-5 单图 Smoke Test，见 [正式报告](t03_b5_report.md)。CPU fake 测试本身不代表真实推理成功。
 
 CLI 使用 argparse；数据契约使用 dataclass、pathlib 等标准库组件。
 输入文本去除首尾空白后必须非空。图片可省略；提供时必须指向现有文件，
@@ -56,7 +56,8 @@ VLM 数据结构独立放在 `vlm/schemas.py`，不修改 T01 契约；VLM datac
 
 | 模块 | 计划职责 |
 | --- | --- |
-| `vlm` | 已实现同步 Protocol、Mock、提示词、工厂和本地 Qwen3-VL 加载/推理/统计逻辑；真实 GPU 执行尚未验证 |
+| `vlm` | 已实现同步 Protocol、Mock、提示词、工厂和本地 Qwen3-VL 加载/推理/统计逻辑；真实 GPU 已完成单图 Smoke Test |
+| `observation` | T04-1/2：严格结构化解析、一次 VLM 调用接一次 BM25 检索、查询来源与响应追踪；仅 CPU 合成集成测试 |
 | `retrieval` | 已实现 JSONL 校验、英文分词、BM25 和稳定排序；稠密/混合检索尚未实现 |
 | `agent` | 受约束工具选择；显式接口、调用上限、超时、停止条件和中间记录 |
 | `verification` | 基于输入及证据产生结果，检查引用，按数据集协议解释标签 |
@@ -70,7 +71,8 @@ BM25 索引只接收证据，`search` 只接收查询和 K，不接受相关性�
 
 未来数据流：文本声明及可选图片 → 多模态理解 → 证据检索 → 受约束工具编排
 → 有证据支撑的验证 → 结构化结果及评估。
-此流程是规划，不是当前已连通的实现。检索得到的内容不自动视为真实证据。
+完整核验流程仍是规划。T04-1/2 已用独立 Python API 串联结构化观察与检索，未接入现有 CLI 或最终判断。
+详见 [T04 设计](t04_design.md)。检索得到的内容不自动视为真实证据。
 
 ## 配置、工程与实验边界
 
