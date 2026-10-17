@@ -92,3 +92,25 @@ git diff --check
 改用项目内新目录；中间一轮既有 CLI 测试出现超时（292 passed、1 failed），单项复跑通过，
 随后完整回归通过。没有放宽测试超时或更改既有测试来绕过失败。
 复跑请更换全新 basetemp 路径，pytest 会清空已存在的 basetemp，不能指向原始实验目录。
+
+## T04-3 实施补充
+
+已新增 `observe-retrieve` CLI 和 `observation_run.py` CPU 运行器。沿用上述结果 Schema、
+`VLMRequest/VLMResponse`、严格解析器、单次 observe_and_retrieve 及原 BM25 API。
+CLI 使用已有 `[bm25]` TOML 格式；数据集名称、版本、划分和 request_id 显式传入。
+独立 StructuredFixtureVLM 只回放合成 JSON，必须在 uncertainties 中包含 [MOCK]，不修改旧 MockVLM。
+无真实后端选项，不读取像素，不接受声明输入，不输出真假判断。
+
+独占创建新目录，快照并哈希实际消费的输入，保留完整 result/trace 和运行 manifest；
+manifest 增补代码版本/dirty 状态/源码哈希、环境、数据集、配置、耗时与样本数。
+失败保存错误和已获取输入；不能创建目录或参数语法错误时仅报告 CLI 错误。
+峰值内存未测量、质量指标未评估，均明确为空。复现命令与文件说明见 README 的 T04-3 节。
+T04-4 批量评测与 T04-5 真实生成验收仍未实施。
+
+2026-10-17 Windows 本地验收（Python 3.12.7，未安装新依赖）：
+
+- `python -m pytest tests/test_observation_cli.py --basetemp outputs/pytest-t043-focused-01`：15 passed（6.95s）。
+- `python -m pytest --basetemp outputs/pytest-t043-full-01`：308 passed（18.35s），含原有 293 项。
+- 两条命令均使用项目 `.venv/Scripts/python.exe`；`git diff --check` 通过。
+- README 命令的 CPU/Mock 演示成功，query 为 `flood road closures`，候选 E001、E002、E004。
+- Mock 只验证接口与记录完整性；没有 GPU、AutoDL、训练、调参或真实视觉质量结论。

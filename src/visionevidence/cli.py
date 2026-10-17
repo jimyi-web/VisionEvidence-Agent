@@ -124,6 +124,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--text", help="Non-empty text claim to validate")
     parser.add_argument("--image", help="Optional path to an existing local image file")
     commands = parser.add_subparsers(dest="command")
+    observation = commands.add_parser("observe-retrieve", help="CPU structured MOCK observation to candidate evidence")
+    observation.add_argument("--observation", type=Path, required=True, help="Strict synthetic observation JSON")
+    observation.add_argument("--image", dest="observation_image", type=Path, required=True)
+    observation.add_argument("--corpus", type=Path, required=True)
+    observation.add_argument("--config", type=Path, help="Existing [bm25] TOML configuration")
+    observation.add_argument("--top-k", type=int, default=3)
+    observation.add_argument("--request-id", required=True)
+    observation.add_argument("--output", type=Path, required=True, help="New run directory; never overwritten")
+    observation.add_argument("--dataset-name", required=True)
+    observation.add_argument("--dataset-version", required=True)
+    observation.add_argument("--split", required=True)
     vlm = commands.add_parser("vlm", help="Run a MOCK or local Qwen3-VL backend")
     vlm.add_argument("--image", dest="vlm_image", required=True, help="Local PNG, JPEG, or WEBP file")
     vlm.add_argument("--backend", choices=("mock", "qwen3_vl"), help="Override config backend; default: mock")
@@ -152,6 +163,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 raise ValueError("top-level --text/--image cannot be combined with subcommands; use vlm --image for VLM input")
             if args.command == "vlm":
                 _run_vlm(args)
+            elif args.command == "observe-retrieve":
+                from visionevidence.observation_run import run_observation
+                result = run_observation(args, _bm25_options)
+                print(json.dumps(result, ensure_ascii=True, allow_nan=False))
             else:
                 _run_retrieval(args)
             return 0
@@ -159,6 +174,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error("--text is required unless using retrieve, evaluate, or vlm")
         claim = ClaimInput(text=args.text, image_path=args.image)
     except (TypeError, ValueError, OSError, BackendUnavailableError, VLMInferenceError) as exc:
+        if args.command == "observe-retrieve":
+            print(json.dumps({"status": "failed", "verified": False, "is_mock": True,
+                              "inference_performed": False, "request_id": args.request_id,
+                              "error": {"type": type(exc).__name__, "message": str(exc)}},
+                             ensure_ascii=True), file=sys.stderr)
+            return 2
         parser.error(str(exc))
 
     print(json.dumps({

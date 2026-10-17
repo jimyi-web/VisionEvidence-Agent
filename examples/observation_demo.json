@@ -1,0 +1,5 @@
+{
+  "objects": ["flood road"],
+  "visible_text": ["closures"],
+  "uncertainties": ["[MOCK] Synthetic fixture; no pixels analyzed, not real visual observations."]
+}

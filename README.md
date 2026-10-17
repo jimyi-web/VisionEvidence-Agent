@@ -4,13 +4,13 @@
 证据检索和受约束的工具调用，对文本声明及可选图片进行有证据支撑的验证，
 并通过可审计的评估与消融实验分析效果。目标里程碑为 2026 年 11 月。
 
-## 当前状态：T03-B-5 单图 GPU 实验已归档；T04-1/2 CPU 集成
+## 当前状态：T03-B-5 单图 GPU 实验已归档；T04-3 CPU/Mock CLI 已集成
 
 [T03-B-5 正式报告](docs/t03_b5_report.md) 从同步的 manifest/runs/result 原始文件提取指标，
 确认 RTX 4090D 上六次真实运行、仅首次加载。它是单图 Smoke Test，不是通用性能或模型质量基准。
 [T04 设计与任务拆解](docs/t04_design.md) 定义结构化观察到 BM25 的接口、错误处理、来源记录与评测方案。
 本轮实现 `observation.py` 的严格解析与注入式 Python API，仅用 CPU 合成响应验证；未修改 Qwen 后端。
-T04 CLI、批量评测和真实结构化输出验收尚未实施。
+T04-3 已增加 CPU/Mock CLI 和独占运行记录；批量评测和真实结构化输出验收尚未实施。
 
 已实现：
 
@@ -157,8 +157,54 @@ outputs/                   本地输出目录（只跟踪 .gitkeep）
 当前固定直接开发依赖和构建依赖，尚未提供跨平台传递依赖锁文件。
 不要覆盖已有实验输出。密钥、原始数据、模型权重、环境和临时输出不得提交。
 
-下一步为 T04-3 的 CPU/Mock CLI 与完整运行记录，再开展固定数据集的检索评测。
+下一步为 T04-4 固定样本及 qrels 的批量检索评测，失败样本计零并单独报告。
 真实结构化生成需单独批准 GPU 验收；现有单图显存结果不外推至其他分辨率或并发负载。
 云实例操作、大型权重下载和 GPU 花费需要开发者明确批准。
 Windows `.venv` 不复制到 Linux。CPU 开发和测试无需安装 PyTorch、Transformers 或 CUDA，
 本次开发未连接 GPU 服务器。
+
+## T04-3：结构化观察 → BM25（仅 CPU/Mock）
+
+入口复用 T04-1/2 的严格解析器和 `observe_and_retrieve`，不修改 BM25、旧 MockVLM 或 Qwen 后端。
+输入是恰含 `objects`、`visible_text`、`uncertainties` 的 UTF-8 JSON；所有字段必须存在。
+本入口只回放人工合成观察，要求 `uncertainties` 含 `[MOCK]`，不修复或补写输入。
+图片仅作文件校验与来源哈希，不分析像素。示例观察与 1×1 图片没有视觉语义对应关系。
+
+```powershell
+.\.venv\Scripts\python.exe -m visionevidence.cli observe-retrieve --observation examples/observation_demo.json --image examples/vlm_demo_fixture.png --corpus examples/evidence_demo.jsonl --config configs/retrieval_bm25.toml --top-k 3 --request-id t043-demo-1 --dataset-name synthetic/demo --dataset-version 1 --split demo --output outputs/t043-demo-1
+```
+
+成功时 stdout 为完整 JSON，退出码 0；以下为字段摘录，不是完整结果：
+
+```json
+{"schema_version":1,"request_id":"t043-demo-1","status":"completed","verified":false,"is_mock":true,"inference_performed":false,"query":"flood road closures"}
+```
+
+候选证据顺序为 E001、E002、E004，包含 `document_id/source/text/score/metadata`。
+观察是合成输入；本阶段不接受待核验声明（manifest 的 `claim` 为 null）；候选证据只是词项匹配，
+不能据此得出真假。`verified=false` 表示未执行核验，绝不是“声明为假”；BM25 分数不是置信度。
+零命中仍为 `completed`、`evidence=[]`。`uncertainties` 不进入查询；仅中文无法构造查询时明确失败。
+
+运行目录必须不存在，每次换一个名称，不覆盖既有记录：
+
+- `observation.json`、`corpus.jsonl`、`image.png`、`config.toml`：实际使用的输入字节快照（扩展名随输入）。
+- `result.json`：现有 schema_version=1 完整结果，包括观察、查询来源、候选证据、VLM 响应与 trace。
+- `manifest.json`：状态、错误（若失败）、输入与结果 SHA-256、Git commit/dirty 状态、Python 源文件哈希、
+  软件包清单、CPU 平台、数据集声明、配置、样本数量和耗时。未测量内存记 null，不提供质量指标。
+
+运行错误在 stderr 输出 JSON，退出码 2；目录创建成功后的失败保留 manifest 和已读取的快照，
+不输出成功结果。参数语法错误仍沿用 argparse 帮助文本；目录创建失败时不能保存新 manifest。
+输入快照可能包含用户数据，应按原输入权限管理；输出目录默认被 Git 忽略。
+
+复现时使用 manifest 对应的代码版本、依赖清单及快照，原样重用 K/BM25 参数与数据集声明，
+仅更换 `--output` 路径。例如将上方 `--observation/--image/--corpus/--config` 分别指向旧运行目录的快照。
+观察、query、query_sources、候选证据及分数应一致；时间、绝对路径和运行环境字段不要求逐字节一致。
+随机种子为 null，因为本路径无随机采样；模型 revision 为 null，因为没有真实模型。
+Git dirty=true 表示包含未提交代码，不能仅凭 commit 复现，应保留对应源码并核对源码哈希。
+
+```powershell
+# 每次使用全新的 basetemp；pytest 会清空已存在的目录，不能指向实验记录。
+.\.venv\Scripts\python.exe -m pytest --basetemp outputs/pytest-t043-new-run
+```
+
+本演示仅验证工程链路，不代表模型视觉能力、真实检索效果或事实核验质量。
