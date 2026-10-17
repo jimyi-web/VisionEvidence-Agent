@@ -1,0 +1,8 @@
+schema_version = 1
+seed = 42
+top_k = 5
+query_policy = "description-v1_vs_objects-visible-text-v1"
+
+[bm25]
+k1 = 1.5
+b = 0.75

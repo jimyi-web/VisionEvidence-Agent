@@ -1,0 +1,2 @@
+# Preserve experiment snapshot bytes so recorded SHA-256 survives Windows checkouts.
+experiments/t04_v1/** -text

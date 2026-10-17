@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "experiment": "T04-4",
+  "status": "completed",
+  "started_utc": "2026-10-17T14:32:29.031593+00:00",
+  "inputs": {
+    "samples.jsonl": {
+      "source": "D:\\Research\\VisionEvidence-Agent\\data\\evaluation\\t04_v1\\samples.jsonl",
+      "sha256": "b668f0b908ec665f4729df628f68848781af837f2ad07b171a9567f45e2a351d"
+    },
+    "corpus.jsonl": {
+      "source": "D:\\Research\\VisionEvidence-Agent\\data\\evaluation\\t04_v1\\corpus.jsonl",
+      "sha256": "12bf5f56e1755b63a10619afd7534f75a1ce67e64b3eab4783b7a423d0e28537"
+    },
+    "qrels.jsonl": {
+      "source": "D:\\Research\\VisionEvidence-Agent\\data\\evaluation\\t04_v1\\qrels.jsonl",
+      "sha256": "348cae535916535fbb0911e95a7359242204cb79e0326b823221b4b85e203d61"
+    },
+    "dataset.json": {
+      "source": "D:\\Research\\VisionEvidence-Agent\\data\\evaluation\\t04_v1\\dataset.json",
+      "sha256": "1f8842b81189ce4bda0cd292fe528340dd72797bec598f8bf6725fd6fbd5c7cf"
+    },
+    "config.toml": {
+      "source": "D:\\Research\\VisionEvidence-Agent\\configs\\t04_evaluation.toml",
+      "sha256": "6d94ff8da2d82647906c7c5224326c82c01d7719cea408549c234c3fb831deba"
+    }
+  },
+  "inference_performed": false,
+  "vlm_calls": 0,
+  "model": null,
+  "peak_memory_bytes": null,
+  "memory_note": "not measured; CPU only",
+  "data_kind": "synthetic_fixture_not_vlm_output",
+  "code": {
+    "source_sha256": {
+      "visionevidence/__init__.py": "a1b27377e1ee0d163addedd0e59444eb0dc4b687d9983a4b28a83a6051ca058d",
+      "visionevidence/agent/__init__.py": "51545362c1913cba91348cf434f35c61cffc67ab099f01d07c16cb8388eb0048",
+      "visionevidence/cli.py": "91dd38197c0cad5d2a3de4c99874ef4dfceb7b8cc0673ed42a49469769221c23",
+      "visionevidence/evaluation/__init__.py": "74afd1cacaa6f828641925716ecd8c684af88a8c2de87c75a2e0727040a3f329",
+      "visionevidence/evaluation/observation.py": "47ebbb0e6033408d26b164c094524bc5d3084373f1976ab8810897e9ecbabd84",
+      "visionevidence/evaluation/retrieval.py": "01f7ee83c1f8b1df575e82d734e48512a180c2504920337e01f99793ad7d454f",
+      "visionevidence/observation.py": "0e5b98bd516b288a6f6732758a6273ec272184593220529d11556f01d1d022b2",
+      "visionevidence/observation_run.py": "1c6d648029d065215f46f08f7831dec0236597db1921e89fbc7ed58c297d1092",
+      "visionevidence/retrieval/__init__.py": "d6bf43fe0c99f920a41ada2913f099782013570b557950d278fe1e1fd8b7cda0",
+      "visionevidence/retrieval/bm25.py": "7f61a840cdec9659c6f4fdc501d1d1c3388dfdba3f9c889eae09dbb6c51eee28",
+      "visionevidence/retrieval/corpus.py": "40934a368fab023c5607a7cba7c7780e29486b55441344c125728ff5487167af",
+      "visionevidence/schemas.py": "bbc084d29efc82e1cdb29596724ff4aefcafa583a4df49e455a2676824eb6ef7",
+      "visionevidence/verification/__init__.py": "9a86a4cdbf92e74b46b948ab11701063b905f7b3682f49be92aae119d4236c94",
+      "visionevidence/vlm/__init__.py": "d40613e8a7bc1bf7eac87ebd8dc02551fce5c1efd5f24ec68c2dadd13fb9a4fd",
+      "visionevidence/vlm/base.py": "4b14c633438684c15af162c671e49bc5ffb960c32cfacc0c93720c9bb1aa4e23",
+      "visionevidence/vlm/experiment.py": "104023886e9dfc9c4a459ad0af6e13a95e656989c7e76fc37ba56363a6f0c2c6",
+      "visionevidence/vlm/factory.py": "ec156dd0b8f2848b051b1696a75afc87a7cc02784991174fe97a6a80bf213f8e",
+      "visionevidence/vlm/mock.py": "30214e88628c4ed2716c428cb723f4b00f2c33baf37af5c27068d661ac11db2e",
+      "visionevidence/vlm/prompts.py": "db09fca8a9c0dd417fb4aa182755f6d33eba9f10ec6122e5a16f71d74da32ad9",
+      "visionevidence/vlm/qwen3_vl.py": "7b4198c2aa8d9f61c1591897e171daa8e925e66a79d700b6b5968e5a8c861aa7",
+      "visionevidence/vlm/schemas.py": "672d1a1500e514361897d434b3488f1a25d4f411b0a84352cb0b6c8e1d52b50b"
+    },
+    "commit": "9917055831a5d861c48bbe2718d20748d363ab5b",
+    "git_status": "",
+    "git_dirty": false
+  },
+  "environment": {
+    "python": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "D:\\Research\\VisionEvidence-Agent\\.venv\\Scripts\\python.exe",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "device": "cpu",
+    "dependencies": [
+      "colorama==0.4.6",
+      "iniconfig==2.3.1",
+      "packaging==26.3",
+      "pillow==11.3.0",
+      "pip==24.2",
+      "pluggy==1.6.0",
+      "pytest==8.3.5",
+      "visionevidence-agent==0.1.0"
+    ]
+  },
+  "config": {
+    "schema_version": 1,
+    "seed": 42,
+    "top_k": 5,
+    "query_policy": "description-v1_vs_objects-visible-text-v1",
+    "bm25": {
+      "k1": 1.5,
+      "b": 0.75
+    }
+  },
+  "random_seed": 42,
+  "randomness": "none; no sampling",
+  "tokenizer": "ascii-alphanumeric-lower-v1",
+  "dataset": {
+    "name": "t04-synthetic-observation-retrieval",
+    "version": "1.0.0",
+    "split": "synthetic_test",
+    "author": "Codex",
+    "human_reviewed": false,
+    "synthetic": true,
+    "real_images": false,
+    "real_vlm_outputs": false,
+    "mock_vlm_called": false,
+    "sample_count": 10,
+    "document_count": 12,
+    "construction": "Authored scene descriptions; extractive structured fields, retained omissions and language/synonym limitations. Fictional closed corpus and relevance rationales. See docs/t04_4_protocol.md."
+  },
+  "index_build_seconds": 0.001220800040755421,
+  "documents": 12,
+  "samples": 10,
+  "artifacts": {
+    "results.jsonl": "f52162ae8a846dff546e2a2e5f8baeaf3788b4955541c77a19e5a791f6eb9f18",
+    "summary.json": "fdbf830796273a49d855a568d0b45548202f607cb2b22e7a647494d00cae6464"
+  },
+  "total_seconds": 0.16343200003029779
+}

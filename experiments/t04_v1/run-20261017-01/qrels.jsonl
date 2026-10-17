@@ -1,0 +1,10 @@
+{"sample_id": "S01", "relevant_ids": ["D01", "D02"], "evidence_status": "available", "rationale": "Route number and bus stop directly match the two scene records."}
+{"sample_id": "S02", "relevant_ids": ["D03"], "evidence_status": "available", "rationale": "Closure sign distinguishes this scene from an open bridge."}
+{"sample_id": "S03", "relevant_ids": ["D05"], "evidence_status": "available", "rationale": "Sunday opening is directly stated."}
+{"sample_id": "S04", "relevant_ids": ["D07"], "evidence_status": "available", "rationale": "Structured fixture omits the visible platform number; preserve this omission."}
+{"sample_id": "S05", "relevant_ids": ["D09"], "evidence_status": "available", "rationale": "The drinking water fountain record is relevant, not the decorative fountain."}
+{"sample_id": "S06", "relevant_ids": ["D11"], "evidence_status": "available", "rationale": "Synthetic scene depicts a car; synonym mismatch is intentional and frozen."}
+{"sample_id": "S07", "relevant_ids": ["D05"], "evidence_status": "available", "rationale": "Same library scene expressed in Chinese; ASCII tokenizer cannot construct either query."}
+{"sample_id": "S08", "relevant_ids": ["D01", "D02"], "evidence_status": "available", "rationale": "Empty structured extraction is retained as a query construction failure."}
+{"sample_id": "S09", "relevant_ids": [], "evidence_status": "corpus_insufficient", "rationale": "No astronomy evidence exists in this closed corpus; cannot evaluate retrieval recall."}
+{"sample_id": "S10", "relevant_ids": ["D04"], "evidence_status": "available", "rationale": "Open bridge contrasts with the closure scene."}
