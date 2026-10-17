@@ -278,6 +278,45 @@ def test_load_time_excluded_from_latency(config, runtime, monkeypatch):
     assert response.latency_ms == response.metadata["generation_ms"] == 500
 
 
+def test_token_comparison_reuses_one_loaded_model(config, runtime):
+    backend = Qwen3VLBackend(config, runtime_loader=runtime.loader)
+    results = [backend.generate(VLMRequest(IMAGE, get_prompt()), max_new_tokens=limit)
+               for limit in [256, 512] * 3]
+    runtime.loader.assert_called_once()
+    runtime.transformers.Qwen3VLForConditionalGeneration.from_pretrained.assert_called_once()
+    assert [r.metadata["model_loaded_this_call"] for r in results] == [True] + [False] * 5
+    assert [c.kwargs["max_new_tokens"] for c in runtime.model.generate.call_args_list] == [256, 512] * 3
+    assert backend.config.max_new_tokens == 256
+    with pytest.raises(ValueError, match="positive integer"):
+        backend.generate(VLMRequest(IMAGE, get_prompt()), max_new_tokens=True)
+
+
+def test_experiment_real_path_with_cpu_doubles(config, runtime, tmp_path, monkeypatch):
+    # These are synthetic runtime doubles, NOT real GPU experimental evidence.
+    import sys
+    from visionevidence.vlm import experiment
+
+    (config.model_path / "config.json").write_text('{}')
+    runtime.torch.manual_seed = Mock()
+    runtime.torch.version = SimpleNamespace(cuda="synthetic")
+    monkeypatch.setitem(sys.modules, "torch", runtime.torch)
+    monkeypatch.setattr(experiment, "load_vlm_config", lambda _: config)
+    backend = Qwen3VLBackend(config, runtime_loader=runtime.loader)
+    factory = Mock(return_value=backend)
+    monkeypatch.setattr(experiment, "create_vlm", factory)
+    monkeypatch.setattr(experiment, "gpu_snapshot", lambda: [{"uuid": "synthetic-GPU"}])
+    output = tmp_path / "synthetic-results"
+    result = experiment.run_experiment(ROOT / "configs/vlm_qwen3_vl.toml", IMAGE, output)
+    records = [json.loads(line) for line in (output / "runs.jsonl").read_text().splitlines()]
+    assert result["status"] == "completed"
+    assert [r["phase"] for r in records] == ["cold"] + ["reuse"] * 5
+    assert [r["response"]["metadata"]["max_new_tokens"] for r in records] == [256, 512] * 3
+    assert all(r["gpu_samples"] and not r["gpu_sampling_errors"] for r in records)
+    factory.assert_called_once()
+    runtime.loader.assert_called_once()
+    runtime.torch.manual_seed.assert_called_once_with(0)
+
+
 def test_custom_generation_and_current_cuda_device(config, runtime):
     cfg = replace(config, device="cuda", max_new_tokens=17, do_sample=True)
     runtime.torch.cuda.current_device.return_value = 1

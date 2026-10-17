@@ -110,6 +110,9 @@ visionevidence vlm --image /path/to/image.jpg --backend qwen3_vl --config config
 
 ## 工程结构
 
+T03-B-5 单进程复用、256/512 token 对比及结构化记录见
+[实验协议与云端命令](docs/t03_b5_experiment.md)。本地 Mock 测试不代表真实 GPU 实验。
+
 ```text
 configs/base.yaml           后续配置模板（T01 不加载）
 configs/retrieval_bm25.toml  可由 --config 加载的 BM25 配置

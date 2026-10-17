@@ -107,7 +107,10 @@ class Qwen3VLBackend:
         self._processor, self._model, self._device = processor, model, device
         self._load_ms = (perf_counter() - started) * 1000
 
-    def generate(self, request: VLMRequest) -> VLMResponse:
+    def generate(self, request: VLMRequest, *, max_new_tokens: int | None = None) -> VLMResponse:
+        token_limit = self.config.max_new_tokens if max_new_tokens is None else max_new_tokens
+        if isinstance(token_limit, bool) or not isinstance(token_limit, int) or token_limit <= 0:
+            raise ValueError("max_new_tokens must be a positive integer")
         if not isinstance(request, VLMRequest):
             raise TypeError("request must be a VLMRequest")
         with self._lock:
@@ -137,7 +140,7 @@ class Qwen3VLBackend:
                     torch.cuda.synchronize(self._device)
                     generation_started = perf_counter()
                     output = model.generate(
-                        **inputs, max_new_tokens=self.config.max_new_tokens,
+                        **inputs, max_new_tokens=token_limit,
                         do_sample=self.config.do_sample, num_beams=1, num_return_sequences=1,
                         return_dict_in_generate=False,
                     )
@@ -163,7 +166,7 @@ class Qwen3VLBackend:
                         "torch_version": str(torch.__version__),
                         "transformers_version": str(self._transformers.__version__),
                         "model_path": str(self.model_path),
-                        "max_new_tokens": self.config.max_new_tokens,
+                        "max_new_tokens": token_limit,
                         "do_sample": self.config.do_sample, "generated_tokens": len(trimmed[0]),
                         "peak_gpu_memory_mb": peak_mb,
                         "peak_gpu_memory_scope": "torch allocated MiB, includes resident model; excludes load peak",
