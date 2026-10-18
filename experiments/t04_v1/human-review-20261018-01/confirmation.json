@@ -1,0 +1,28 @@
+{
+  "review_id": "human-review-20261018-01",
+  "confirmation_date": "2026-10-18",
+  "timezone": "Asia/Shanghai",
+  "date_basis": "Date of user confirmation in this chat; exact review start/end times were not supplied.",
+  "reviewer": "project user (single human reviewer; name not supplied)",
+  "human_reviewers": 1,
+  "method": "User reports reading the audit materials with ChatGPT assistance and personally confirming all 120 sample-document relevance decisions. Codex transcribes and validates the confirmed decisions.",
+  "source": "Explicit user confirmation table and exhaustive-negative declaration in this Codex chat; no external ChatGPT transcript was supplied or independently inspected.",
+  "independent_blind_review": false,
+  "multi_annotator_study": false,
+  "professional_annotation_team": false,
+  "unlisted_documents_label": "not_relevant",
+  "uncertain_count": 0,
+  "document_ids": ["D01", "D02", "D03", "D04", "D05", "D06", "D07", "D08", "D09", "D10", "D11", "D12"],
+  "samples": [
+    {"sample_id": "S01", "relevant_ids": ["D01", "D02"], "note": "两篇近重复证据均计入文档级相关性"},
+    {"sample_id": "S02", "relevant_ids": ["D03"], "note": "D04 的 Bridge open 与 Bridge closed 冲突；D06 主题不匹配"},
+    {"sample_id": "S03", "relevant_ids": ["D05"], "note": "部分覆盖：缺少 empty 状态，不能完整核验"},
+    {"sample_id": "S04", "relevant_ids": ["D07"], "note": "D08 为 Platform 2；编号不符。结构化查询遗漏 Platform 7"},
+    {"sample_id": "S05", "relevant_ids": ["D09"], "note": "D10 为 No drinking，不相关；文字匹配不证明水质安全"},
+    {"sample_id": "S06", "relevant_ids": ["D11"], "note": "automobile 与 car 为同义表达，BM25 词面匹配失败"},
+    {"sample_id": "S07", "relevant_ids": ["D05"], "note": "Open Sunday 语义对应周日开放；D06 状态相反"},
+    {"sample_id": "S08", "relevant_ids": ["D01", "D02"], "note": "Route 12 匹配；额外红色巴士描述不冲突；D12 为 Route 9"},
+    {"sample_id": "S09", "relevant_ids": [], "note": "D01–D12 全部不相关，确认封闭语料 corpus_insufficient"},
+    {"sample_id": "S10", "relevant_ids": ["D04"], "note": "Bridge open 匹配；D03 的 Bridge closed 状态冲突"}
+  ]
+}

@@ -1,0 +1,700 @@
+{
+  "archive": "experiments/t04_v1/run-20261017-01",
+  "input_and_artifact_sha256": {
+    "samples.jsonl": "b668f0b908ec665f4729df628f68848781af837f2ad07b171a9567f45e2a351d",
+    "corpus.jsonl": "12bf5f56e1755b63a10619afd7534f75a1ce67e64b3eab4783b7a423d0e28537",
+    "qrels.jsonl": "348cae535916535fbb0911e95a7359242204cb79e0326b823221b4b85e203d61",
+    "dataset.json": "1f8842b81189ce4bda0cd292fe528340dd72797bec598f8bf6725fd6fbd5c7cf",
+    "config.toml": "6d94ff8da2d82647906c7c5224326c82c01d7719cea408549c234c3fb831deba",
+    "results.jsonl": "f52162ae8a846dff546e2a2e5f8baeaf3788b4955541c77a19e5a791f6eb9f18",
+    "summary.json": "fdbf830796273a49d855a568d0b45548202f607cb2b22e7a647494d00cae6464"
+  },
+  "manifest_sha256": "307a602b9750bd765da09aee8b90c075efd0e28f619109533aa3532bf757b3cf",
+  "samples": 10,
+  "result_rows": 20,
+  "replay_matches": true,
+  "term_sums_match": true,
+  "score_tolerance": 1e-12,
+  "excluded_ids": [
+    "S09"
+  ],
+  "summary": {
+    "Baseline": {
+      "total": 10,
+      "evaluated": 9,
+      "excluded_ids": [
+        "S09"
+      ],
+      "end_to_end": {
+        "recall_at_1": 0.5555555555555556,
+        "recall_at_3": 0.7777777777777778,
+        "recall_at_5": 0.7777777777777778,
+        "mrr_at_5": 0.7222222222222222
+      },
+      "successful_query_count": 8,
+      "successful_query_subset": {
+        "recall_at_1": 0.625,
+        "recall_at_3": 0.875,
+        "recall_at_5": 0.875,
+        "mrr_at_5": 0.8125
+      },
+      "diagnostics": {
+        "retrieval_no_hit": 1,
+        "query_construction_error": 1,
+        "evidence_insufficient": 1
+      }
+    },
+    "Structured": {
+      "total": 10,
+      "evaluated": 9,
+      "excluded_ids": [
+        "S09"
+      ],
+      "end_to_end": {
+        "recall_at_1": 0.6111111111111112,
+        "recall_at_3": 0.6666666666666666,
+        "recall_at_5": 0.6666666666666666,
+        "mrr_at_5": 0.6666666666666666
+      },
+      "successful_query_count": 7,
+      "successful_query_subset": {
+        "recall_at_1": 0.7857142857142857,
+        "recall_at_3": 0.8571428571428571,
+        "recall_at_5": 0.8571428571428571,
+        "mrr_at_5": 0.8571428571428571
+      },
+      "diagnostics": {
+        "retrieval_no_hit": 2,
+        "query_construction_error": 2,
+        "evidence_insufficient": 1
+      }
+    }
+  },
+  "term_contributions": [
+    {
+      "sample_id": "S01",
+      "method": "Baseline",
+      "document_id": "D02",
+      "score": 9.905307280702361,
+      "terms": {
+        "12": 1.426659708353011,
+        "a": 0.2714222304689805,
+        "bus": 1.6870404760514273,
+        "red": 1.426659708353011,
+        "route": 1.1354948938081684,
+        "sign": 1.1354948938081684,
+        "stop": 1.1354948938081684,
+        "the": 1.6870404760514273
+      }
+    },
+    {
+      "sample_id": "S01",
+      "method": "Baseline",
+      "document_id": "D01",
+      "score": 8.478647781249927,
+      "terms": {
+        "12": 1.4918094963031698,
+        "a": 0.41678185405140566,
+        "beside": 0.9599433386327535,
+        "bus": 1.7436068751242477,
+        "red": 1.4918094963031698,
+        "route": 1.1873483604175903,
+        "stop": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S01",
+      "method": "Baseline",
+      "document_id": "D12",
+      "score": 4.723668216806617,
+      "terms": {
+        "a": 0.4312413594280686,
+        "bus": 1.8040982154754903,
+        "route": 1.244164320951529,
+        "stop": 1.244164320951529
+      }
+    },
+    {
+      "sample_id": "S01",
+      "method": "Baseline",
+      "document_id": "D03",
+      "score": 2.5346823536019096,
+      "terms": {
+        "a": 0.4811664343726085,
+        "beside": 0.9180210254211328,
+        "sign": 1.1354948938081684
+      }
+    },
+    {
+      "sample_id": "S01",
+      "method": "Baseline",
+      "document_id": "D04",
+      "score": 1.604130214468996,
+      "terms": {
+        "a": 0.41678185405140566,
+        "sign": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S01",
+      "method": "Structured",
+      "document_id": "D01",
+      "score": 7.101922588565768,
+      "terms": {
+        "12": 1.4918094963031698,
+        "bus": 1.7436068751242477,
+        "red": 1.4918094963031698,
+        "route": 1.1873483604175903,
+        "stop": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S01",
+      "method": "Structured",
+      "document_id": "D02",
+      "score": 6.811349680373786,
+      "terms": {
+        "12": 1.426659708353011,
+        "bus": 1.6870404760514273,
+        "red": 1.426659708353011,
+        "route": 1.1354948938081684,
+        "stop": 1.1354948938081684
+      }
+    },
+    {
+      "sample_id": "S01",
+      "method": "Structured",
+      "document_id": "D12",
+      "score": 4.2924268573785485,
+      "terms": {
+        "bus": 1.8040982154754903,
+        "route": 1.244164320951529,
+        "stop": 1.244164320951529
+      }
+    },
+    {
+      "sample_id": "S02",
+      "method": "Baseline",
+      "document_id": "D03",
+      "score": 8.934294677073076,
+      "terms": {
+        "a": 0.4811664343726085,
+        "beside": 0.9180210254211328,
+        "bicycle": 1.426659708353011,
+        "bridge": 2.1196331984121337,
+        "closed": 1.426659708353011,
+        "river": 1.426659708353011,
+        "sign": 1.1354948938081684
+      }
+    },
+    {
+      "sample_id": "S02",
+      "method": "Baseline",
+      "document_id": "D04",
+      "score": 6.7784536210815425,
+      "terms": {
+        "a": 0.41678185405140566,
+        "bicycle": 1.4918094963031698,
+        "bridge": 2.1907044140062073,
+        "river": 1.4918094963031698,
+        "sign": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S02",
+      "method": "Baseline",
+      "document_id": "D06",
+      "score": 1.9332216212367104,
+      "terms": {
+        "closed": 1.9332216212367104
+      }
+    },
+    {
+      "sample_id": "S02",
+      "method": "Baseline",
+      "document_id": "D09",
+      "score": 1.503169251776109,
+      "terms": {
+        "a": 0.44674021693829535,
+        "beside": 1.0564290348378136
+      }
+    },
+    {
+      "sample_id": "S02",
+      "method": "Baseline",
+      "document_id": "D10",
+      "score": 1.4538559037172192,
+      "terms": {
+        "a": 0.4939125650844657,
+        "beside": 0.9599433386327535
+      }
+    },
+    {
+      "sample_id": "S02",
+      "method": "Structured",
+      "document_id": "D03",
+      "score": 6.399612323471167,
+      "terms": {
+        "bicycle": 1.426659708353011,
+        "bridge": 2.1196331984121337,
+        "closed": 1.426659708353011,
+        "river": 1.426659708353011
+      }
+    },
+    {
+      "sample_id": "S02",
+      "method": "Structured",
+      "document_id": "D04",
+      "score": 5.174323406612547,
+      "terms": {
+        "bicycle": 1.4918094963031698,
+        "bridge": 2.1907044140062073,
+        "river": 1.4918094963031698
+      }
+    },
+    {
+      "sample_id": "S02",
+      "method": "Structured",
+      "document_id": "D06",
+      "score": 1.9332216212367104,
+      "terms": {
+        "closed": 1.9332216212367104
+      }
+    },
+    {
+      "sample_id": "S03",
+      "method": "Baseline",
+      "document_id": "D05",
+      "score": 9.271559839679773,
+      "terms": {
+        "entrance": 1.9332216212367104,
+        "library": 1.9332216212367104,
+        "open": 1.9332216212367104,
+        "sunday": 1.9332216212367104,
+        "the": 1.5386733547329319
+      }
+    },
+    {
+      "sample_id": "S03",
+      "method": "Baseline",
+      "document_id": "D06",
+      "score": 7.338338218443063,
+      "terms": {
+        "entrance": 1.9332216212367104,
+        "library": 1.9332216212367104,
+        "sunday": 1.9332216212367104,
+        "the": 1.5386733547329319
+      }
+    },
+    {
+      "sample_id": "S03",
+      "method": "Baseline",
+      "document_id": "D03",
+      "score": 3.485361810839983,
+      "terms": {
+        "a": 0.4811664343726085,
+        "sign": 1.1354948938081684,
+        "with": 1.8687004826592062
+      }
+    },
+    {
+      "sample_id": "S03",
+      "method": "Baseline",
+      "document_id": "D04",
+      "score": 3.095939710772166,
+      "terms": {
+        "a": 0.41678185405140566,
+        "open": 1.4918094963031698,
+        "sign": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S03",
+      "method": "Baseline",
+      "document_id": "D02",
+      "score": 3.0939576003285763,
+      "terms": {
+        "a": 0.2714222304689805,
+        "sign": 1.1354948938081684,
+        "the": 1.6870404760514273
+      }
+    },
+    {
+      "sample_id": "S03",
+      "method": "Structured",
+      "document_id": "D05",
+      "score": 7.7328864849468415,
+      "terms": {
+        "entrance": 1.9332216212367104,
+        "library": 1.9332216212367104,
+        "open": 1.9332216212367104,
+        "sunday": 1.9332216212367104
+      }
+    },
+    {
+      "sample_id": "S03",
+      "method": "Structured",
+      "document_id": "D06",
+      "score": 5.799664863710131,
+      "terms": {
+        "entrance": 1.9332216212367104,
+        "library": 1.9332216212367104,
+        "sunday": 1.9332216212367104
+      }
+    },
+    {
+      "sample_id": "S03",
+      "method": "Structured",
+      "document_id": "D04",
+      "score": 1.4918094963031698,
+      "terms": {
+        "open": 1.4918094963031698
+      }
+    },
+    {
+      "sample_id": "S04",
+      "method": "Baseline",
+      "document_id": "D07",
+      "score": 8.228861347949794,
+      "terms": {
+        "7": 2.1504403413756243,
+        "a": 0.44674021693829535,
+        "platform": 2.348172684696836,
+        "suitcase": 1.6417540524695189,
+        "train": 1.6417540524695189
+      }
+    },
+    {
+      "sample_id": "S04",
+      "method": "Baseline",
+      "document_id": "D08",
+      "score": 6.078421006574169,
+      "terms": {
+        "a": 0.44674021693829535,
+        "platform": 2.348172684696836,
+        "suitcase": 1.6417540524695189,
+        "train": 1.6417540524695189
+      }
+    },
+    {
+      "sample_id": "S04",
+      "method": "Baseline",
+      "document_id": "D03",
+      "score": 3.485361810839983,
+      "terms": {
+        "a": 0.4811664343726085,
+        "sign": 1.1354948938081684,
+        "with": 1.8687004826592062
+      }
+    },
+    {
+      "sample_id": "S04",
+      "method": "Baseline",
+      "document_id": "D04",
+      "score": 1.604130214468996,
+      "terms": {
+        "a": 0.41678185405140566,
+        "sign": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S04",
+      "method": "Baseline",
+      "document_id": "D02",
+      "score": 1.406917124277149,
+      "terms": {
+        "a": 0.2714222304689805,
+        "sign": 1.1354948938081684
+      }
+    },
+    {
+      "sample_id": "S04",
+      "method": "Structured",
+      "document_id": "D07",
+      "score": 5.631680789635874,
+      "terms": {
+        "platform": 2.348172684696836,
+        "suitcase": 1.6417540524695189,
+        "train": 1.6417540524695189
+      }
+    },
+    {
+      "sample_id": "S04",
+      "method": "Structured",
+      "document_id": "D08",
+      "score": 5.631680789635874,
+      "terms": {
+        "platform": 2.348172684696836,
+        "suitcase": 1.6417540524695189,
+        "train": 1.6417540524695189
+      }
+    },
+    {
+      "sample_id": "S05",
+      "method": "Baseline",
+      "document_id": "D09",
+      "score": 9.087558039466396,
+      "terms": {
+        "a": 0.44674021693829535,
+        "beside": 1.0564290348378136,
+        "dog": 2.1504403413756243,
+        "drinking": 1.6417540524695189,
+        "fountain": 1.6417540524695189,
+        "water": 2.1504403413756243
+      }
+    },
+    {
+      "sample_id": "S05",
+      "method": "Baseline",
+      "document_id": "D10",
+      "score": 6.391511384110544,
+      "terms": {
+        "a": 0.4939125650844657,
+        "beside": 0.9599433386327535,
+        "drinking": 1.4918094963031698,
+        "fountain": 1.4918094963031698,
+        "notice": 1.954036487786984
+      }
+    },
+    {
+      "sample_id": "S05",
+      "method": "Baseline",
+      "document_id": "D03",
+      "score": 1.3991874597937413,
+      "terms": {
+        "a": 0.4811664343726085,
+        "beside": 0.9180210254211328
+      }
+    },
+    {
+      "sample_id": "S05",
+      "method": "Baseline",
+      "document_id": "D01",
+      "score": 1.3767251926841593,
+      "terms": {
+        "a": 0.41678185405140566,
+        "beside": 0.9599433386327535
+      }
+    },
+    {
+      "sample_id": "S05",
+      "method": "Baseline",
+      "document_id": "D07",
+      "score": 0.44674021693829535,
+      "terms": {
+        "a": 0.44674021693829535
+      }
+    },
+    {
+      "sample_id": "S05",
+      "method": "Structured",
+      "document_id": "D09",
+      "score": 7.584388787690287,
+      "terms": {
+        "dog": 2.1504403413756243,
+        "drinking": 1.6417540524695189,
+        "fountain": 1.6417540524695189,
+        "water": 2.1504403413756243
+      }
+    },
+    {
+      "sample_id": "S05",
+      "method": "Structured",
+      "document_id": "D10",
+      "score": 2.9836189926063397,
+      "terms": {
+        "drinking": 1.4918094963031698,
+        "fountain": 1.4918094963031698
+      }
+    },
+    {
+      "sample_id": "S08",
+      "method": "Baseline",
+      "document_id": "D02",
+      "score": 6.791607096297923,
+      "terms": {
+        "12": 1.426659708353011,
+        "a": 0.2714222304689805,
+        "bus": 1.6870404760514273,
+        "route": 1.1354948938081684,
+        "sign": 1.1354948938081684,
+        "stop": 1.1354948938081684
+      }
+    },
+    {
+      "sample_id": "S08",
+      "method": "Baseline",
+      "document_id": "D01",
+      "score": 6.026894946314004,
+      "terms": {
+        "12": 1.4918094963031698,
+        "a": 0.41678185405140566,
+        "bus": 1.7436068751242477,
+        "route": 1.1873483604175903,
+        "stop": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S08",
+      "method": "Baseline",
+      "document_id": "D12",
+      "score": 4.723668216806617,
+      "terms": {
+        "a": 0.4312413594280686,
+        "bus": 1.8040982154754903,
+        "route": 1.244164320951529,
+        "stop": 1.244164320951529
+      }
+    },
+    {
+      "sample_id": "S08",
+      "method": "Baseline",
+      "document_id": "D03",
+      "score": 3.485361810839983,
+      "terms": {
+        "a": 0.4811664343726085,
+        "sign": 1.1354948938081684,
+        "with": 1.8687004826592062
+      }
+    },
+    {
+      "sample_id": "S08",
+      "method": "Baseline",
+      "document_id": "D04",
+      "score": 1.604130214468996,
+      "terms": {
+        "a": 0.41678185405140566,
+        "sign": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S09",
+      "method": "Baseline",
+      "document_id": "D10",
+      "score": 0.4939125650844657,
+      "terms": {
+        "a": 0.4939125650844657
+      }
+    },
+    {
+      "sample_id": "S09",
+      "method": "Baseline",
+      "document_id": "D03",
+      "score": 0.4811664343726085,
+      "terms": {
+        "a": 0.4811664343726085
+      }
+    },
+    {
+      "sample_id": "S09",
+      "method": "Baseline",
+      "document_id": "D07",
+      "score": 0.44674021693829535,
+      "terms": {
+        "a": 0.44674021693829535
+      }
+    },
+    {
+      "sample_id": "S09",
+      "method": "Baseline",
+      "document_id": "D08",
+      "score": 0.44674021693829535,
+      "terms": {
+        "a": 0.44674021693829535
+      }
+    },
+    {
+      "sample_id": "S09",
+      "method": "Baseline",
+      "document_id": "D09",
+      "score": 0.44674021693829535,
+      "terms": {
+        "a": 0.44674021693829535
+      }
+    },
+    {
+      "sample_id": "S10",
+      "method": "Baseline",
+      "document_id": "D03",
+      "score": 7.031654717605128,
+      "terms": {
+        "a": 0.4811664343726085,
+        "bridge": 2.1196331984121337,
+        "river": 1.426659708353011,
+        "sign": 1.1354948938081684,
+        "with": 1.8687004826592062
+      }
+    },
+    {
+      "sample_id": "S10",
+      "method": "Baseline",
+      "document_id": "D04",
+      "score": 6.778453621081543,
+      "terms": {
+        "a": 0.41678185405140566,
+        "bridge": 2.1907044140062073,
+        "open": 1.4918094963031698,
+        "river": 1.4918094963031698,
+        "sign": 1.1873483604175903
+      }
+    },
+    {
+      "sample_id": "S10",
+      "method": "Baseline",
+      "document_id": "D05",
+      "score": 1.9332216212367104,
+      "terms": {
+        "open": 1.9332216212367104
+      }
+    },
+    {
+      "sample_id": "S10",
+      "method": "Baseline",
+      "document_id": "D02",
+      "score": 1.406917124277149,
+      "terms": {
+        "a": 0.2714222304689805,
+        "sign": 1.1354948938081684
+      }
+    },
+    {
+      "sample_id": "S10",
+      "method": "Baseline",
+      "document_id": "D10",
+      "score": 0.4939125650844657,
+      "terms": {
+        "a": 0.4939125650844657
+      }
+    },
+    {
+      "sample_id": "S10",
+      "method": "Structured",
+      "document_id": "D04",
+      "score": 5.174323406612547,
+      "terms": {
+        "bridge": 2.1907044140062073,
+        "open": 1.4918094963031698,
+        "river": 1.4918094963031698
+      }
+    },
+    {
+      "sample_id": "S10",
+      "method": "Structured",
+      "document_id": "D03",
+      "score": 3.546292906765145,
+      "terms": {
+        "bridge": 2.1196331984121337,
+        "river": 1.426659708353011
+      }
+    },
+    {
+      "sample_id": "S10",
+      "method": "Structured",
+      "document_id": "D05",
+      "score": 1.9332216212367104,
+      "terms": {
+        "open": 1.9332216212367104
+      }
+    }
+  ]
+}

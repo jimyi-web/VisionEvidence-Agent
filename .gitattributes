@@ -1,2 +1,7 @@
 # Preserve experiment snapshot bytes so recorded SHA-256 survives Windows checkouts.
 experiments/t04_v1/** -text
+# Windows archive CRLF is intentional; still check real trailing spaces.
+experiments/t04_v1/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# These historical documents are byte-hashed by the human-review manifest.
+docs/t04_5_report.md -text
+docs/t04_5_reproduction.md -text

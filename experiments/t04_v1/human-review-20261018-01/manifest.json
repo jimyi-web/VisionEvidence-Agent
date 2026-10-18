@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "review_id": "human-review-20261018-01",
+  "archived_date": "2026-10-18",
+  "timezone": "Asia/Shanghai",
+  "integrity_note": "Hashes bind historical inputs and new review artifacts; not an independent timestamp or signature.",
+  "sha256": {
+    "experiments/t04_v1/run-20261017-01/config.toml": "6d94ff8da2d82647906c7c5224326c82c01d7719cea408549c234c3fb831deba",
+    "experiments/t04_v1/run-20261017-01/corpus.jsonl": "12bf5f56e1755b63a10619afd7534f75a1ce67e64b3eab4783b7a423d0e28537",
+    "experiments/t04_v1/run-20261017-01/dataset.json": "1f8842b81189ce4bda0cd292fe528340dd72797bec598f8bf6725fd6fbd5c7cf",
+    "experiments/t04_v1/run-20261017-01/manifest.json": "307a602b9750bd765da09aee8b90c075efd0e28f619109533aa3532bf757b3cf",
+    "experiments/t04_v1/run-20261017-01/qrels.jsonl": "348cae535916535fbb0911e95a7359242204cb79e0326b823221b4b85e203d61",
+    "experiments/t04_v1/run-20261017-01/results.jsonl": "f52162ae8a846dff546e2a2e5f8baeaf3788b4955541c77a19e5a791f6eb9f18",
+    "experiments/t04_v1/run-20261017-01/samples.jsonl": "b668f0b908ec665f4729df628f68848781af837f2ad07b171a9567f45e2a351d",
+    "experiments/t04_v1/run-20261017-01/summary.json": "fdbf830796273a49d855a568d0b45548202f607cb2b22e7a647494d00cae6464",
+    "experiments/t04_v1/audit-20261018-01/audit.json": "48325d5cb1abec10451d596658ad668418191ce666c5ec59cfb1f0f224f7fedb",
+    "experiments/t04_v1/audit-20261018-01/human_review.md": "f1983009051118fbb01e7c4e8cefd95b6527d47447dfafbb6372595a71268b39",
+    "docs/t04_5_report.md": "0ac6eb16818428e70b9c99d51974e2e58b6a8df9a4f7815dfcd8705d2f07501d",
+    "docs/t04_5_reproduction.md": "da96b3cbad595d2c8ce4921ecfab0fd72fd42f84f8c2a1c87cd76cb28e0d98fa",
+    "experiments/t04_v1/human-review-20261018-01/confirmation.json": "1df7016f0f1aeef6444e6dbaf4b8bf0007e5821eb2a00dc4f811db07d07c17ee",
+    "experiments/t04_v1/human-review-20261018-01/judgments.jsonl": "afd715558aaba5e5bd20b06f0e5ddd615610622e83ee9aad1996203401df46a3",
+    "experiments/t04_v1/human-review-20261018-01/report.md": "5cdd319b5b83ce645140e6e69aa212c770c53c47a7539a67b9ebd860dd5133ce",
+    "experiments/t04_v1/human-review-20261018-01/statistics.json": "2dd9c5e8892dcb1b7911cf7fcf27a38eccc3a2e81510cd8277aa96a633858820"
+  }
+}

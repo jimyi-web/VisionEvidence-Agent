@@ -1,0 +1,11 @@
+{
+  "samples": 10,
+  "documents": 12,
+  "judgments": 120,
+  "relevant": 11,
+  "not_relevant": 109,
+  "uncertain": 0,
+  "matches": 120,
+  "mismatches": [],
+  "comparison": "human confirmation versus frozen synthetic qrels; not inter-annotator agreement"
+}
