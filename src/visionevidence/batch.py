@@ -90,6 +90,11 @@ class StructuredMock:
     """Fixed synthetic observation; never derives visual content from a caption."""
     def generate(self, request):
         request.validate_image()
+        if request.prompt != PROMPT:
+            return VLMResponse(request.request_id, "[MOCK] A road sign. No image analysis performed.",
+                               "structured-mock-v1", "mock", True, 0.0,
+                               {"inference_performed": False, "verified": False,
+                                "content_source": "fixed_synthetic_description_fixture"})
         return VLMResponse(request.request_id, dumps({"objects": ["road sign"],
                            "visible_text": [], "uncertainties": ["[MOCK] no image analysis"]}),
                            "structured-mock-v1", "mock", True, 0.0,
@@ -196,7 +201,8 @@ def summary(db, limit, documents, backend, top_k):
 def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | None = None,
               limit: int = 100, batch_size: int = 32, max_attempts: int = 2,
               resume: bool = False, top_k: int = 3, k1: float = 1.5, b: float = 0.75,
-              qrels: Path | None = None, backend_factory=None, progress: bool = False) -> dict:
+              qrels: Path | None = None, backend_factory=None, progress: bool = False,
+              query_mode: str = "structured", task: str = "evidence_retrieval") -> dict:
     """Fixed dataset, growing prefix. max_attempts is a lifetime per-sample budget.
 
     Increasing it explicitly on resume permits recovery after repairing missing images.
@@ -207,6 +213,14 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
             raise ValueError(f"{name} must be a positive integer")
     samples, corpus, output = Path(samples).resolve(), Path(corpus).resolve(), Path(output).resolve()
     config = config or VLMConfig()
+    if query_mode not in {"structured", "baseline"}:
+        raise ValueError("query_mode must be structured or baseline")
+    if task not in {"evidence_retrieval", "image_to_caption_retrieval_proxy"}:
+        raise ValueError("unsupported retrieval task")
+    from visionevidence.description import PROMPT as BASELINE_PROMPT, PROMPT_VERSION as BASELINE_VERSION, describe_and_retrieve
+    effective_prompt = PROMPT if query_mode == "structured" else BASELINE_PROMPT
+    prompt_version = PROMPT_VERSION if query_mode == "structured" else BASELINE_VERSION
+    processor = observe_and_retrieve if query_mode == "structured" else describe_and_retrieve
     if config.do_sample:
         raise ValueError("batch v1 requires deterministic do_sample=false")
     index = BM25Index(load_corpus(corpus), k1=k1, b=b)
@@ -226,7 +240,8 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
                 "qrels_sha256": sha256(Path(qrels)) if qrels else None,
                 "samples_path": str(samples), "corpus_path": str(corpus),
                 "vlm_config": effective_config,
-                "effective_prompt": PROMPT, "effective_prompt_version": PROMPT_VERSION,
+                "effective_prompt": effective_prompt, "effective_prompt_version": prompt_version,
+                "query_mode": query_mode, "task": task,
                 "source_sha256": code["source_sha256"], "model_file_sha256": model_files,
                 "retrieval": {"top_k": top_k, "k1": k1, "b": b}, "seed": 0}
     if resume:
@@ -272,7 +287,8 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
                     for _, row in read_jsonl(qrels):
                         if row.keys() != {"sample_id", "relevant_ids", "annotation_source", "kind"}:
                             raise ValueError("qrels require sample_id,relevant_ids,annotation_source,kind")
-                        if row["kind"] not in ("human_relevance", "synthetic_relevance"):
+                        permitted = ("caption_pair_proxy",) if task == "image_to_caption_retrieval_proxy" else ("human_relevance", "synthetic_relevance")
+                        if row["kind"] not in permitted:
                             raise ValueError("pair/classification labels are not retrieval relevance judgments")
                         ids = row["relevant_ids"]
                         if not isinstance(ids, list) or any(not isinstance(i, str) for i in ids):
@@ -325,7 +341,7 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
                             attempt = db.execute("INSERT INTO attempts(sample_id,started,status,image_sha256) VALUES(?,?,'running',?)",
                                                  (sample_id, now(), image_hash)).lastrowid
                         try:
-                            request = VLMRequest(image, PROMPT, sample_id, config.max_image_size_mb)
+                            request = VLMRequest(image, effective_prompt, sample_id, config.max_image_size_mb)
                             if backend is None:
                                 backend = backend_factory() if backend_factory else (
                                     StructuredMock() if config.backend == "mock" else create_vlm(config.backend, config=config))
@@ -343,7 +359,7 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
                             # Record intent BEFORE entering the backend so hard crashes are auditable.
                             with db:
                                 db.execute("UPDATE attempts SET backend_called=1 WHERE id=?", (attempt,))
-                            result = observe_and_retrieve(request, capture, index, k=top_k)
+                            result = processor(request, capture, index, k=top_k)
                             if result["trace"]["image_sha256"] != image_hash:
                                 raise ValueError("image changed during inference")
                             result["input"] = row
@@ -366,6 +382,9 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
                 if progress:
                     print(dumps({"session": session, "processed_prefix": position, "target": limit}), file=sys.stderr, flush=True)
             report = summary(db, limit, len(index.document_ids), config.backend, top_k)
+            report.update({"task": task, "query_mode": query_mode})
+            if task == "image_to_caption_retrieval_proxy":
+                report["qrels_status"] = "same-image caption association proxy; not independent relevance or factual truth"
             report.update({"session": session, "elapsed_seconds": perf_counter() - started,
                            "updated_utc": now(), "requested_limit": limit})
             # Numbered snapshots are immutable. SQLite holds all earlier sessions and errors.
@@ -393,6 +412,8 @@ def main(argv=None):
     parser.add_argument("--k1", type=float, default=1.5)
     parser.add_argument("--b", type=float, default=0.75)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--query-mode", choices=("structured", "baseline"), default="structured")
+    parser.add_argument("--task", choices=("evidence_retrieval", "image_to_caption_retrieval_proxy"), default="evidence_retrieval")
     args = parser.parse_args(argv)
     try:
         config = load_vlm_config(args.config)
@@ -400,7 +421,8 @@ def main(argv=None):
             raise ValueError("--mode must match config backend; no implicit fallback")
         report = run_batch(samples=args.samples, corpus=args.corpus, output=args.output, config=config,
                            limit=args.limit, batch_size=args.batch_size, max_attempts=args.max_attempts,
-                           resume=args.resume, top_k=args.top_k, k1=args.k1, b=args.b, qrels=args.qrels, progress=True)
+                           resume=args.resume, top_k=args.top_k, k1=args.k1, b=args.b, qrels=args.qrels, progress=True,
+                           query_mode=args.query_mode, task=args.task)
         print(dumps(report))
         return 0 if report["status"] == "completed" else 1
     except (OSError, ValueError, TypeError, sqlite3.Error) as exc:

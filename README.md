@@ -26,6 +26,7 @@ flowchart LR
 - T05-A：流式 JSONL、稳定 ID、分批调度、SQLite 进度、断点、重试、成功缓存、输入/源码/模型哈希、Commit/环境追踪。
 - CPU/Mock 可本地运行；新多图结构化链路尚待真实 GPU 验收。
 - VERITE 适配器已用官方 CSV 小子集验证；真实图片受机构邮箱申请及条款限制。[数据选择](docs/t05_datasets.md)。
+- Flickr8k 真实图片 proxy：已取得 test 前 20 张 JPEG，保留 6000/1000/1000 原划分与每图五条描述；两路共享 5,000 条 test 候选，CPU/Mock 端到端和恢复已通过，真实 GPU 由开发者手动验收。[协议](docs/flickr8k_protocol.md)、[下载/离线/GPU 命令](docs/flickr8k_runbook.md)、[验收报告](docs/flickr8k_report.md)。
 
 ## 已有实验与边界
 
@@ -38,6 +39,7 @@ flowchart LR
 | T04-5 人工辅助审核 | 12 | 同一 10 个场景 | 0 | 120 个样本-文档关系，非 120 个查询或图片 |
 | T05 CPU/Mock 分阶段 | 5 | 100 → 1,000 → 10,000 | 0 | 验证调度/缓存/恢复；复用 1 个合成白像素 fixture，不代表万张真实图片 |
 | VERITE 元数据子集 | 0 | 12 条配对记录 | 0 | 8 图片路径、本地图片 0，非检索效果实验 |
+| Flickr8k 真实 JPEG + Mock | 5,000 条候选描述 | 20 图片查询/路，共 40 查询槽位 | 0 | 20 张真实图已解码；Mock 不分析像素，尚无真实 VLM 质量指标 |
 
 T04 固定合成集主结果（宏平均 n=9，非空 qrels 的查询失败记零）：
 
@@ -87,6 +89,14 @@ prompt、源码、证据库、配置或模型改变要新目录；成功图片�
 
 ## 真实数据与 GPU 下一步
 
+VERITE 图片申请 PENDING 时，当前优先用 Flickr8k 做 **image-to-caption retrieval proxy**。20 张真实图片已获取，候选库固定为 test 的 5,000 条人工描述；正确描述只作为检索目标，不进入 VLM prompt。配对 qrels 显式标记 caption_pair_proxy，不用于外部事实核验。当前完整测试 **371 passed**。
+
+```powershell
+.\.venv\Scripts\python.exe -m visionevidence.caption_experiment --dataset data/processed/flickr8k-proxy-v1/test --output outputs/flickr8k-mock-new --mode mock --limit 20
+```
+
+运行前按 [Flickr8k runbook](docs/flickr8k_runbook.md) 下载/离线适配。后续 20→100→1000 仅扩大同一个 test 查询前缀，候选库不变；8,000 图按 train/dev/test 分开运行。指标是同图描述关联命中率/召回率，不能称为谣言识别准确率；相似图片的描述可能也是合理答案，五条同图描述也不是独立图片样本。
+
 按 [VERITE 元数据步骤](docs/t05_datasets.md) 接入，再经 [官方 HF](https://huggingface.co/datasets/stefpapad/VERITE) 申请图片；保留图片哈希与条款。当前官方 CSV 和论文总数差 1 条，适配器按实际字节原样保留。
 
 图文配对标签**不是检索 qrels**；模型生成不是人工核验事实。没有独立相关性标注时指标 null。真实语料需独立准备，不能把正确 caption 塞入证据库制造高分。
@@ -105,6 +115,9 @@ prompt、源码、证据库、配置或模型改变要新目录；成功图片�
 | --- | --- |
 | src/visionevidence/batch.py | 批量 CLI、SQLite、来源、评测 |
 | src/visionevidence/datasets/verite.py | 官方 CSV 适配与标签隔离 |
+| src/visionevidence/datasets/flickr8k.py | 固定版本小图下载、离线导入、原始划分和五描述 |
+| src/visionevidence/caption_experiment.py | Baseline/Structured 同候选对照与 proxy 指标 |
+| src/visionevidence/description.py | 原始散文 VLM 描述直接检索基线 |
 | src/visionevidence/vlm/ | Mock/Qwen、本地加载与契约 |
 | src/visionevidence/observation.py | 严格解析、查询来源、观察到检索 |
 | src/visionevidence/retrieval/ | BM25 与语料校验 |

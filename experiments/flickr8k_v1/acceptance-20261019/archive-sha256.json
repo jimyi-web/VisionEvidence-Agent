@@ -1,0 +1,18 @@
+{
+  "adapter-manifest.json": "e85c84b433830c3d2e00306fdbf82189ce655cc94d4463fc475126bb9f51d779",
+  "baseline-manifest.json": "e59f43a931f47945e6e19a6ae1add44e02bc5afc8824a46823131229a56abb1b",
+  "baseline-summary-0001.json": "5b69a210a560f2a6d075218d1a1fdf5ee5629e4b335258c0f562e72c7cfefb82",
+  "baseline-summary-0002.json": "77d001b638c81c249946a4a3b2305749c070ee8228a2fadf42f54b61c9fa7050",
+  "download-0001.json": "0b151c515b9abf7730ed60a4c8439b4ac9162d885183aaf563562afdc8be3fb3",
+  "experiment.json": "0150d28bcda6c9d6a65377bc872219bfedf0015c9872f51452b6da682a0dae4d",
+  "image-inventory.json": "94bf1e34284c0f7fafeef2140e07eb2ad655f3cfa588578407afc32866b898a8",
+  "local-artifacts.json": "553592d7ac8567628353178c082a72a48550e74c7e78d9b47732a429a7bfe5ca",
+  "mock-comparison-0001.json": "1661cec1a14273e41bff8e5a47fe57dfb71670bd4a5ab4a01639a5458471fa7a",
+  "mock-comparison-0002.json": "d09b05e2bb4630b5f8723ec32ab7738d4e8f3957ac66b3fff294e5696faefc5f",
+  "pytest.xml": "88c9a1b6e1fab612e432ef5d36414bd5460af8ce7c430080d876d02b3dadf5b9",
+  "source.json": "bdffb9a0e22b570aa5e1ace853b42119a6e0f9d0feb277f3b3cf24522c3bd206",
+  "structured-manifest.json": "2b60728254dd5c1ad88b439c23b95f0aa635bbc5beddba822cc9fe7729ef6d5c",
+  "structured-summary-0001.json": "613343eefe1b66e43da9e123e8d05ab6bc467d7c64ccf7b9fd205344aa494f55",
+  "structured-summary-0002.json": "95d3034a95bb1cecc04ddc39ed8f5cb96d8d714beb4be7fe2f8ab715d5c67b84",
+  "validation.json": "2e1abe2c517705495f03f92cf841ad6cf43fe9a39016bfc8a9d151c78fc11ee4"
+}

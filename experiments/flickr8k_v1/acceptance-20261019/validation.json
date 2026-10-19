@@ -1,0 +1,19 @@
+{
+  "tests": {
+    "passed": 371,
+    "seconds": 48.13,
+    "new_tests": 19,
+    "command": ".\\.venv\\Scripts\\python.exe -m pytest --basetemp outputs/pytest-flickr8k-full-01 --junitxml=outputs/pytest-flickr8k-full-01.xml",
+    "temporary_git_safe_directory": "D:/Research/VisionEvidence-Agent"
+  },
+  "task": "image_to_caption_retrieval_proxy",
+  "real_jpeg_images_downloaded": 20,
+  "image_bytes": 2421770,
+  "metadata_bytes": 2515706,
+  "candidate_caption_documents": 5000,
+  "evaluation_images_per_branch": 20,
+  "retrieval_query_slots": 40,
+  "real_gpu_calls": 0,
+  "mock_resume_additional_attempts": 0,
+  "pip_check": "No broken requirements found."
+}

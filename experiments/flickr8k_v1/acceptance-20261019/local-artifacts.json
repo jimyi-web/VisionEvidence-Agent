@@ -1,0 +1,42 @@
+{
+  "outputs/flickr8k-mock-20-01/baseline/state.sqlite3": {
+    "sha256": "45c87affa8b384ff527fd8619a17299657e6ed5e7634b0cc9b50a8264ae8204c",
+    "bytes": 1339392
+  },
+  "outputs/flickr8k-mock-20-01/baseline/results-0001.jsonl": {
+    "sha256": "38635eccb3f599c15ae3d2942dfd879452424274a0752c9211c2c2607d6ac584",
+    "bytes": 114261
+  },
+  "outputs/flickr8k-mock-20-01/baseline/results-0002.jsonl": {
+    "sha256": "38635eccb3f599c15ae3d2942dfd879452424274a0752c9211c2c2607d6ac584",
+    "bytes": 114261
+  },
+  "outputs/flickr8k-mock-20-01/structured/state.sqlite3": {
+    "sha256": "99ad0fdf234161cc66d84cbda97dee355d5e1d11a24840cb6adc4059376efae6",
+    "bytes": 1339392
+  },
+  "outputs/flickr8k-mock-20-01/structured/results-0001.jsonl": {
+    "sha256": "6df2faa915e3c6c3d07d739ead265546bdd75dd81fcedc68a93c229608f074fc",
+    "bytes": 114926
+  },
+  "outputs/flickr8k-mock-20-01/structured/results-0002.jsonl": {
+    "sha256": "6df2faa915e3c6c3d07d739ead265546bdd75dd81fcedc68a93c229608f074fc",
+    "bytes": 114926
+  },
+  "data/processed/flickr8k-proxy-v1/test/samples.jsonl": {
+    "sha256": "9f5cdc8ac218c628f674987826942a1b944771e74eacd7483f2d271a73a607a3",
+    "bytes": 528325
+  },
+  "data/processed/flickr8k-proxy-v1/test/captions.jsonl": {
+    "sha256": "483b0e1de3bf3fc18f3e26aaee57fedebb06416cdd2679966c47c7db927ee781",
+    "bytes": 370535
+  },
+  "data/processed/flickr8k-proxy-v1/test/corpus.jsonl": {
+    "sha256": "2b6007f1ffd51d40f31bc123b624e3d7aa9344ca3e0404a5691e264ae8cbd599",
+    "bytes": 1919510
+  },
+  "data/processed/flickr8k-proxy-v1/test/qrels.jsonl": {
+    "sha256": "e0c9738c5f0c2e5882c45576923bcd5e274569de877ef17c5ebfea01bd3f3a8d",
+    "bytes": 427650
+  }
+}

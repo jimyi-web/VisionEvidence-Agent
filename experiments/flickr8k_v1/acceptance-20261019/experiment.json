@@ -1,0 +1,1 @@
+{"adapter_manifest_sha256": "e85c84b433830c3d2e00306fdbf82189ce655cc94d4463fc475126bb9f51d779", "cutoffs": [1, 5, 10], "split": "test", "task": "image_to_caption_retrieval_proxy"}

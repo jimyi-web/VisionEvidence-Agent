@@ -1,0 +1,76 @@
+{
+  "task": "image_to_caption_retrieval_proxy",
+  "repository": "intro/flickr8k",
+  "dataset_version": "c7a02cb487da0eca729e133194b0f842cb578c08",
+  "upstream_revision": "c7a02cb487da0eca729e133194b0f842cb578c08",
+  "input_metadata_sha256": {
+    "train": "1433edf3b9ff638e8504adee125bc76924b5676de71bc43be264892140931d22",
+    "dev": "8265c8bf3a7455aee49f7b56cd35158fbcdae8b543b8f2d178657bded35eb8e5",
+    "test": "acb1d59a68c7056288eee4c65e1035bd2b188db2c3651b5f471dfe8bac384f7e"
+  },
+  "source_manifest_sha256": "bdffb9a0e22b570aa5e1ace853b42119a6e0f9d0feb277f3b3cf24522c3bd206",
+  "selection_order": "ascending filename per original split",
+  "splits": {
+    "train": {
+      "images": 6000,
+      "candidate_caption_documents": 30000,
+      "available_images": 0,
+      "available_image_sha256": {},
+      "outputs": {
+        "samples": "23de0825c36b4aaa81b57866773d0eaa7d103849c493a33695f81367df6fd41c",
+        "captions": "9817eb371d4fe779562c2ad37f1a58c8950b3c5f0c06c09627c4b9454510580f",
+        "corpus": "3ef15f75d9a486fd4919f95bff4ab4d051f1d9c18dc0c169dc0da5716125cca0",
+        "qrels": "355fa877afcdcf5f12b9b10f159cc136e93684bc73d96034ee03a5495749b031"
+      }
+    },
+    "dev": {
+      "images": 1000,
+      "candidate_caption_documents": 5000,
+      "available_images": 0,
+      "available_image_sha256": {},
+      "outputs": {
+        "samples": "c18aec08f65944cc27df851fccb867e1bbe6440c857df4eac95d6b711ea70126",
+        "captions": "197ad2512fd39d1f265804de949161c6f08e5a3412856be792a07195c9a9a4b4",
+        "corpus": "afb12393c43641f8b8255c938d28b0bfc970fb5b75006263322ffed6ffba3251",
+        "qrels": "d041288fd590890e248d284d25eddbadc69999f7e9e5ba566b5494e2234a4b3a"
+      }
+    },
+    "test": {
+      "images": 1000,
+      "candidate_caption_documents": 5000,
+      "available_images": 20,
+      "available_image_sha256": {
+        "1056338697_4f7d7ce270.jpg": "1f24abbba43782d733dedbb0b4f416635af50263862e5632963ac9263e430555",
+        "106490881_5a2dd9b7bd.jpg": "4049bafb01c855c74b84eed95a722fd3074ab07a3395957d83444d92db8c0458",
+        "1082379191_ec1e53f996.jpg": "cd911c154e0223c9e588dd22f93b5c51baa4ce0197c0e50b4d54a1a00ee42298",
+        "1084040636_97d9633581.jpg": "3e4bf16825c99bb495b3590531c2a0fe0de1bc01aa6e02cc72427e61c82845aa",
+        "1096395242_fc69f0ae5a.jpg": "2f1c884985d38ae1ef13a642132eff9e5dd234f9dbe469655e16544ba03d76bd",
+        "1107246521_d16a476380.jpg": "ceffbdf8b5e2e8835e2d24968343ddd19098b5b0a509461fa4e7660aa1f3c3f9",
+        "1119015538_e8e796281e.jpg": "13c3af7ffe5f54f5d63434f0d50dea8093a2e53b97203b35c66cca795e6815f0",
+        "1122944218_8eb3607403.jpg": "52f2138f3f53fb5767baa9b56763318532ee0b46679c9c3959d7c8a2fe0ba3f0",
+        "1131800850_89c7ffd477.jpg": "12c39926875ad989093f16d9d2eb161c4f9caabdef8615128af08a07cef58894",
+        "1131932671_c8d17751b3.jpg": "67d16bfaf2dd3e4b8040edf9ce16822feeeeee9e10b939796207efe54c06eaef",
+        "113678030_87a6a6e42e.jpg": "84d2cd1910c4db2ae07058147a2601b6f28a669729aac587dea6045fb8b26527",
+        "114051287_dd85625a04.jpg": "c5ac2ec5307d77833d7864171238f29d157663e82b486f966098046747a0dc6a",
+        "115684808_cb01227802.jpg": "e66027ecdd8713579415a54811784b4cf6e725188c82e66ca573ae4409482115",
+        "1167669558_87a8a467d6.jpg": "0d762755c3e4cd12523a37e143776b3a0de9343e19644f24024f9418bd5ce747",
+        "1174525839_7c1e6cfa86.jpg": "1c28d3ef08fa0346554836c57b32fad4a4ab9a20ddcd00824410cb850d0107b4",
+        "1174629344_a2e1a2bdbf.jpg": "380e0378a0af335b07d89ec1df8ca01ec0b55f906cdee0cbf1758b066f3ae22d",
+        "1220401002_3f44b1f3f7.jpg": "91e718c6f3f6f68882cd6baf987f53ae90868106c3ca8cd21f107a62009d927b",
+        "1224851143_33bcdd299c.jpg": "5a87279cbbdd44b760ea1d347d2d5c04ac986d1e19afee114a2066a659d494ce",
+        "1237985362_dbafc59280.jpg": "50a9e586879dddad81f542351e31bf6a2758e8ad228fb6b69c7c1fb424658335",
+        "1248940539_46d33ed487.jpg": "a9a661c967f927464f372dd9b8a8b34a07b942c0813ae3230134fc2e5c1e7c9a"
+      },
+      "outputs": {
+        "samples": "9f5cdc8ac218c628f674987826942a1b944771e74eacd7483f2d271a73a607a3",
+        "captions": "483b0e1de3bf3fc18f3e26aaee57fedebb06416cdd2679966c47c7db927ee781",
+        "corpus": "2b6007f1ffd51d40f31bc123b624e3d7aa9344ca3e0404a5691e264ae8cbd599",
+        "qrels": "e0c9738c5f0c2e5882c45576923bcd5e274569de877ef17c5ebfea01bd3f3a8d"
+      }
+    }
+  },
+  "qrels_semantics": "five same-image captions are proxy positives; other-image captions are assumed negatives, not fact judgments",
+  "source_verified": true,
+  "provider_license_claim": "cc0-1.0",
+  "original_photo_rights_verified": false
+}
