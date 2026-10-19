@@ -1,219 +1,115 @@
-# VisionEvidence-Agent
+# VisionEvidence-Agent · V1.0
 
-T04-4 固定合成样本检索评测（Windows CPU，无 VLM 调用）：
+一个轻量、可复现、可审计的多模态证据检索研究基线，面向科研实习申请展示。短期目标：**2026-10-20 前完成 V1.0**；长期目标：**10,000+ 查询的大规模可复现评测**。
 
-```powershell
-.\.venv\Scripts\python.exe -m visionevidence.evaluation.observation --dataset data/evaluation/t04_v1 --config configs/t04_evaluation.toml --output outputs/t04-4-replay-01
+研究问题：将图像的可见对象和文字组织成结构化观察，能否比完整自然语言描述构造更好的证据检索查询？如何保留失败、来源、标注边界和计算成本，使比较可审核？
+
+当前覆盖视觉观察 → 查询构造 → BM25 候选证据 → 可恢复批量评测。**最终事实核验决策、Agent 规划、Dense/Hybrid Retrieval 尚未实现。** 候选证据与模型描述均不是已确认事实，模型输出始终 verified=false。
+
+## 流程与状态
+
+```mermaid
+flowchart LR
+  A[JSONL 与本地图片] --> B[SQLite 断点与调度]
+  B --> C[Qwen3-VL 或明确标注的 Mock]
+  C --> D[严格结构化观察]
+  D --> E[objects + visible_text 查询]
+  E --> F[BM25 候选证据]
+  F --> G[结果与运行记录]
+  H[独立相关性 qrels] --> I[Recall / MRR]
+  G --> I
 ```
 
-每次使用新输出目录，禁止覆盖。目录内保存数据/配置快照、manifest.json、summary.json 和包含两组逐样本候选全文、分数及诊断的 results.jsonl。
-评测定义与数据偏差见 [协议](docs/t04_4_protocol.md)，实测结果与限制见 [报告](docs/t04_4_report.md)。
+- 真实 Qwen3-VL-4B：单 GPU BF16、本地权重、首次加载复用、耗时/显存记录；已有单图实测。
+- 严格观察解析：拒绝截断/散文，保留失败原响应；不自动补造字段。
+- BM25：保留文档 ID、来源、原文、分数；独立 qrels 驱动端到端 Recall@K/MRR@K。
+- T05-A：流式 JSONL、稳定 ID、分批调度、SQLite 进度、断点、重试、成功缓存、输入/源码/模型哈希、Commit/环境追踪。
+- CPU/Mock 可本地运行；新多图结构化链路尚待真实 GPU 验收。
+- VERITE 适配器已用官方 CSV 小子集验证；真实图片受机构邮箱申请及条款限制。[数据选择](docs/t05_datasets.md)。
 
-一个轻量、可复现的多模态证据验证研究项目。研究目标是结合视觉语言模型、
-证据检索和受约束的工具调用，对文本声明及可选图片进行有证据支撑的验证，
-并通过可审计的评估与消融实验分析效果。目标里程碑为 2026 年 11 月。
+## 已有实验与边界
 
-## 当前状态：T03-B-5 单图 GPU 实验已归档；T04-3 CPU/Mock CLI 已集成
+三种规模始终分开：**证据库文档数、评测查询数、真实 VLM 图片推理调用数**。独立图片另计，重试不是新图片。
 
-[T03-B-5 正式报告](docs/t03_b5_report.md) 从同步的 manifest/runs/result 原始文件提取指标，
-确认 RTX 4090D 上六次真实运行、仅首次加载。它是单图 Smoke Test，不是通用性能或模型质量基准。
-[T04 设计与任务拆解](docs/t04_design.md) 定义结构化观察到 BM25 的接口、错误处理、来源记录与评测方案。
-本轮实现 `observation.py` 的严格解析与注入式 Python API，仅用 CPU 合成响应验证；未修改 Qwen 后端。
-T04-3 已增加 CPU/Mock CLI 和独占运行记录；批量评测和真实结构化输出验收尚未实施。
+| 实验 | 证据文档 | 查询/样本 | 真实图片推理调用 | 结论 |
+| --- | ---: | ---: | ---: | --- |
+| T03-B-5 GPU smoke | 0 | 0 个检索查询，1 张输入图 | 6 次，独立图 1 张 | RTX 4090D 加载复用成功；6/6 达 token 上限，观察质量未通过验收 |
+| T04-4 合成对照 | 12 | 10，9 条进入指标分母 | 0 | Structured 无一致优势 |
+| T04-5 人工辅助审核 | 12 | 同一 10 个场景 | 0 | 120 个样本-文档关系，非 120 个查询或图片 |
+| T05 CPU/Mock 分阶段 | 5 | 100 → 1,000 → 10,000 | 0 | 验证调度/缓存/恢复；复用 1 个合成白像素 fixture，不代表万张真实图片 |
+| VERITE 元数据子集 | 0 | 12 条配对记录 | 0 | 8 图片路径、本地图片 0，非检索效果实验 |
 
-已实现：
+T04 固定合成集主结果（宏平均 n=9，非空 qrels 的查询失败记零）：
 
-- `src` 布局、Python 包元数据和 CLI 入口。
-- 标准库 dataclass：输入 `ClaimInput`、证据 `Evidence`、结果契约 `VerificationResult`。
-- 非空文本、图片文件路径、证据字段、有限数值分数及基本元数据校验。
-- CLI 的 `--help`、`--version` 和输入校验；JSON 输出明确包含 `inference_performed: false`。
-- CPU 单元测试与 CLI 子进程测试。
-- 严格 UTF-8 JSONL 证据读取、英文分词、内存 BM25 索引和稳定 Top-K 排序。
-- `retrieve` 子命令及 JSON 输出；显式 qrels 驱动的 Recall@K、MRR@K 宏平均评测。
-- 版本控制中的 BM25 配置、合成演示数据，以及包含输入 SHA-256 和环境的评测 JSON。
-- 同步 `BaseVLM` 接口、请求/响应数据契约、英文观察提示词和可注入的 `MockVLM`。
-- `vlm` CLI、TOML 配置、图片文件头/大小校验，以及明确标记 MOCK 的文本和 JSON 输出。
-- 可选的本地 Qwen3-VL 后端：单 GPU BF16、模型复用、完整图片解码、生成 token 裁剪、耗时与显存元数据。
-- GPU 依赖文件和分步部署文档；后端控制流由 CPU 模拟运行库测试覆盖。
+| 方法 | Recall@1 | Recall@3 | Recall@5 | MRR@5 |
+| --- | ---: | ---: | ---: | ---: |
+| 完整描述 Baseline | 0.555556 | 0.777778 | 0.777778 | 0.722222 |
+| Structured | 0.611111 | 0.666667 | 0.666667 | 0.666667 |
 
-真实 GPU 加载、模型复用、耗时与显存已有上述单图实验记录；输出截断，尚无模型质量评测。
-尚未实现稠密/混合检索、Agent 决策、验证预测、真实数据集接入及演示界面。
-`configs/base.yaml` 仅为后续配置模板，当前 CLI 不加载它。
+场景、描述、结构字段和证据由 AI 合成；人工在 AI 辅助阅读后确认 120 个关系：相关 11、不相关 109，与冻结标签一致。这不是盲审或标注者间一致性。全部指标差异来自 S08 空提取和 S10 首位改善；ASCII 分词、同义/否定处理不足及闭集合成偏差仍存在。[协议](docs/t04_4_protocol.md)、[报告](docs/t04_4_report.md)、[失败审计](docs/t04_5_report.md)、[后续人工审核](docs/t04_5_human_archive.md)。
 
-## 本地安装（Windows / PowerShell）
+历史 GPU 首次加载约 4.78 秒；256-token 复用 wall 均值约 6.44 秒，512-token 约 12.97 秒；PyTorch allocated 峰值约 8,751 MiB，整卡采样最大 9,241 MiB。口径不同，不能保证新图片/并发容量；没有视觉或最终核验准确率。[单图 GPU 报告](docs/t03_b5_report.md)。
 
-在项目根目录操作，要求已有 Python 3.12 的 `.venv`。
-若 `.venv` 不存在，先由开发者确认环境创建方案；不要使用全局 Python 代替。
-无需激活环境或修改 PowerShell 执行策略。
+## Windows 本地运行
+
+要求已有项目 `.venv`、Python 3.12；无需激活，不使用全局 Python。没有环境时先由开发者确认创建方案。运行基础设施无第三方依赖；pytest/Pillow 是开发依赖，Qwen 使用独立 Linux GPU 环境。
 
 ```powershell
-.\.venv\Scripts\python.exe --version
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 .\.venv\Scripts\python.exe -m pip check
-```
-
-基础运行路径无第三方依赖。开发依赖为 pytest 和图片解码测试使用的 Pillow，构建使用 setuptools；直接依赖版本在
-`pyproject.toml` 中固定。安装需要能够访问相应 Python 包索引。
-当前验证目标是 Python 3.12，其他版本尚未验证。
-
-## 使用与测试
-
-```powershell
-.\.venv\Scripts\python.exe -m visionevidence.cli --help
 .\.venv\Scripts\python.exe -m visionevidence.cli --version
-.\.venv\Scripts\python.exe -m visionevidence.cli --text "这是一条待验证的声明。"
-# 将路径替换为本地已有图片；相对路径基于当前工作目录。
-.\.venv\Scripts\python.exe -m visionevidence.cli --text "图片中的声明。" --image ".\example.png"
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-安装也会生成 `.\.venv\Scripts\visionevidence.exe` 命令入口。
-CLI 成功校验返回退出码 0；缺失参数、空声明、图片路径不存在或指向目录返回 2。
-原有 `--text ... --image ...` 路径只检查文件路径，不读取内容或验证图片编码。
-新 `vlm --image ...` 子命令另行检查文件头、扩展名和大小。校验成功不表示声明为真，
-原有输入校验路径不输出预测标签或检索证据。检索子命令输出匹配证据，
-不输出事实核验标签；BM25 分数不是概率或真实性置信度。
-
-## CPU 检索与评测演示
-
-以下文件均为 **synthetic/demo 合成数据**，不是真实新闻或事实证据。
-不安装 rank-bm25：该基线由 Python 标准库实现，保持运行时零第三方依赖。
+若 Git 报 dubious ownership，可仅对当前 PowerShell 进程配置项目例外后测试，不改全局设置：
 
 ```powershell
-.\.venv\Scripts\python.exe -m visionevidence.cli retrieve --query "flood road closures" --corpus examples/evidence_demo.jsonl --top-k 3 --config configs/retrieval_bm25.toml
+$env:GIT_CONFIG_COUNT='1'
+$env:GIT_CONFIG_KEY_0='safe.directory'
+$env:GIT_CONFIG_VALUE_0='D:/Research/VisionEvidence-Agent'
+.\.venv\Scripts\python.exe -m pytest
+```
+
+## CPU/Mock：100 → 1000 → 10000
+
+以下是合成调度验收，不分析真实图片。先准备完整输入，保持文件不变；新实验使用新目录，--resume 扩大前缀并跳过成功样本。
+
+```powershell
+.\.venv\Scripts\python.exe scripts/prepare_t05_mock.py --output outputs/t05-input-new.jsonl --count 10000
+.\.venv\Scripts\python.exe -m visionevidence.batch --mode mock --samples outputs/t05-input-new.jsonl --corpus examples/evidence_demo.jsonl --output outputs/t05-run-new --limit 100 --batch-size 32
+.\.venv\Scripts\python.exe -m visionevidence.batch --mode mock --samples outputs/t05-input-new.jsonl --corpus examples/evidence_demo.jsonl --output outputs/t05-run-new --limit 1000 --batch-size 128 --resume
+.\.venv\Scripts\python.exe -m visionevidence.batch --mode mock --samples outputs/t05-input-new.jsonl --corpus examples/evidence_demo.jsonl --output outputs/t05-run-new --limit 10000 --batch-size 512 --resume
+```
+
+输出含固定 manifest、输入快照、state.sqlite3、每阶段独立 summary/results。错误和原响应查 attempts；--max-attempts 默认 2，是跨 session 累计预算，修复缺图后可显式提高，成功结果不覆盖。退出码 0=所选样本完成，1=有未完成样本，2=配置/输入/目录错误。
+
+prompt、源码、证据库、配置或模型改变要新目录；成功图片哈希变化拒绝缓存。batch-size 是调度大小，GPU 逐图推理。[输入/qrels/恢复协议与 GPU 小批命令](docs/t05_pipeline.md)、[本轮验收](docs/t05_report.md)。
+
+## 真实数据与 GPU 下一步
+
+按 [VERITE 元数据步骤](docs/t05_datasets.md) 接入，再经 [官方 HF](https://huggingface.co/datasets/stefpapad/VERITE) 申请图片；保留图片哈希与条款。当前官方 CSV 和论文总数差 1 条，适配器按实际字节原样保留。
+
+图文配对标签**不是检索 qrels**；模型生成不是人工核验事实。没有独立相关性标注时指标 null。真实语料需独立准备，不能把正确 caption 塞入证据库制造高分。
+
+开发者在已有批准的 GPU 环境中手动运行 [12 条命令](docs/t05_pipeline.md)，先检查 JSON 成功率和成本再扩大规模。本轮不启动 AutoDL、不下载模型权重。万级 GPU、真实检索标注和最终 verifier 留待后续。
+
+## 历史复现与导航
+
+```powershell
+.\.venv\Scripts\python.exe -m visionevidence.evaluation.observation --dataset data/evaluation/t04_v1 --config configs/t04_evaluation.toml --output outputs/t04-replay-new
+.\.venv\Scripts\python.exe scripts/validate_t04_human_review.py
 .\.venv\Scripts\python.exe -m visionevidence.cli retrieve --query "flood road closures" --corpus examples/evidence_demo.jsonl --top-k 3 --json
-.\.venv\Scripts\python.exe -m visionevidence.cli evaluate --corpus examples/evidence_demo.jsonl --qrels examples/qrels_demo.jsonl --top-k 3 --config configs/retrieval_bm25.toml --dataset-name synthetic/demo --dataset-version 1 --split demo --output outputs/retrieval-demo.json
 ```
 
-也可使用 `.\.venv\Scripts\visionevidence.exe retrieve ...`。评测输出始终为 JSON；
-`--output` 使用独占创建，已存在时返回错误，请为新运行选择新文件名。
-演示共 5 个查询，4 个参与评测、1 个无标注而排除。确定性结果为
-Recall@3 = 0.75、MRR@3 = 0.75；仅证明演示链路可复现，不代表真实检索质量。
-格式、边界行为、公式和 Dense Retrieval 对比计划见 [检索基线说明](docs/retrieval_baseline.md)。
+| 路径 | 用途 |
+| --- | --- |
+| src/visionevidence/batch.py | 批量 CLI、SQLite、来源、评测 |
+| src/visionevidence/datasets/verite.py | 官方 CSV 适配与标签隔离 |
+| src/visionevidence/vlm/ | Mock/Qwen、本地加载与契约 |
+| src/visionevidence/observation.py | 严格解析、查询来源、观察到检索 |
+| src/visionevidence/retrieval/ | BM25 与语料校验 |
+| configs/ | 模型/检索配置、观察 Schema |
+| experiments/ | 小型审计归档，不放图片/大数据 |
+| docs/qwen3_vl_deployment.md | 人工部署与 GPU 环境要求 |
 
-## VLM Mock 演示（T03-A）
-
-`examples/vlm_demo_fixture.png` 是 69 字节、1×1 白色像素的 **synthetic/demo fixture**，
-仅用于验证接口，不是真实场景或研究证据。Mock 不分析图片，不从文件名推断内容。
-
-```powershell
-.\.venv\Scripts\python.exe -m visionevidence.cli vlm --image examples/vlm_demo_fixture.png --backend mock
-.\.venv\Scripts\python.exe -m visionevidence.cli vlm --image examples/vlm_demo_fixture.png --config configs/vlm_mock.toml --request-id demo-1 --json
-.\.venv\Scripts\python.exe -m pytest
-```
-
-安装后的入口同样支持 `.\.venv\Scripts\visionevidence.exe vlm --image ... --backend mock`。
-文本包含 `[MOCK]`；JSON 包含 `backend: "mock"`、`is_mock: true` 和
-`metadata.inference_performed: false`。内容固定，实际调用耗时会变化。
-`qwen3_vl` 必须配置现有本地模型目录和独立 GPU 环境；目录缺失时退出码 2，不下载权重。
-接口、配置与输入安全限制见 [VLM 接口说明](docs/vlm_interface.md)。
-
-## Qwen3-VL 后端（T03-B-1）
-
-完成云端人工部署后可运行：
-
-```bash
-visionevidence vlm --image /path/to/image.jpg --backend qwen3_vl --config configs/vlm_qwen3_vl.toml --json
-```
-
-配置中的 model_path 默认位于 AutoDL 数据盘，支持修改。真实后端输出 `backend=qwen3_vl`、
-`is_mock=false`、`inference_performed=true`，但始终 `verified=false`。
-采用官方 Qwen3VLForConditionalGeneration + AutoProcessor，固定 Transformers 4.57.1，
-模型/处理器仅从本地加载；不修改 BaseVLM.generate 接口，不连接检索与验证逻辑。
-依赖依据、独立环境、下载、显存/耗时口径和 OOM 处理见
-[云端部署与人工验收](docs/qwen3_vl_deployment.md)。这些云端步骤尚未在本任务执行。
-
-## 工程结构
-
-T03-B-5 单进程复用、256/512 token 对比及结构化记录见
-[实验协议与云端命令](docs/t03_b5_experiment.md)。本地 Mock 测试不代表真实 GPU 实验。
-
-```text
-configs/base.yaml           后续配置模板（T01 不加载）
-configs/retrieval_bm25.toml  可由 --config 加载的 BM25 配置
-configs/vlm_mock.toml       Mock 后端、模型名称、大小上限与提示词版本
-configs/vlm_qwen3_vl.toml    本地权重路径、单 GPU BF16 与生成/图片限制
-requirements/              独立 GPU 依赖和 PyTorch 版本约束
-docs/architecture.md        模块边界、数据契约与数据流
-docs/retrieval_baseline.md  BM25 协议、格式、复现命令与局限
-docs/vlm_interface.md       VLM 契约、Mock 测试与真实推理边界
-docs/qwen3_vl_deployment.md  AutoDL 分步部署与待完成的 GPU 验收
-examples/                  synthetic/demo 证据、qrels 与图片 fixture
-src/visionevidence/         Python 包、数据结构与 CLI
-  vlm/                     VLM 契约、Mock、提示词及后端工厂
-  retrieval/               JSONL 读取、分词和 BM25 索引
-  agent/                   工具编排预留模块
-  verification/            验证决策预留模块
-  evaluation/              qrels 校验、Recall@K 和 MRR@K
-scripts/                   后续可复现脚本目录
-tests/                     数据结构与 CLI 测试
-outputs/                   本地输出目录（只跟踪 .gitkeep）
-```
-
-`scripts/.gitkeep` 用于让 Git 保留空目录；模块目录用带职责说明的 `__init__.py` 保留。
-测试针对安装后的包运行，不通过修改 `sys.path` 绕过 `src` 布局。
-
-## 可复现性与后续 GPU 计划
-
-后续实验必须记录数据集版本和划分、模型标识与 revision、随机种子、配置、
-软件环境、硬件、运行耗时、峰值显存、指标和样本数。配置模板中的种子尚未用于实验。
-可用以下命令检查环境清单，运行正式实验时应将其保存至该次独立实验目录：
-
-```powershell
-.\.venv\Scripts\python.exe -m pip freeze
-```
-
-当前固定直接开发依赖和构建依赖，尚未提供跨平台传递依赖锁文件。
-不要覆盖已有实验输出。密钥、原始数据、模型权重、环境和临时输出不得提交。
-
-下一步为 T04-4 固定样本及 qrels 的批量检索评测，失败样本计零并单独报告。
-真实结构化生成需单独批准 GPU 验收；现有单图显存结果不外推至其他分辨率或并发负载。
-云实例操作、大型权重下载和 GPU 花费需要开发者明确批准。
-Windows `.venv` 不复制到 Linux。CPU 开发和测试无需安装 PyTorch、Transformers 或 CUDA，
-本次开发未连接 GPU 服务器。
-
-## T04-3：结构化观察 → BM25（仅 CPU/Mock）
-
-入口复用 T04-1/2 的严格解析器和 `observe_and_retrieve`，不修改 BM25、旧 MockVLM 或 Qwen 后端。
-输入是恰含 `objects`、`visible_text`、`uncertainties` 的 UTF-8 JSON；所有字段必须存在。
-本入口只回放人工合成观察，要求 `uncertainties` 含 `[MOCK]`，不修复或补写输入。
-图片仅作文件校验与来源哈希，不分析像素。示例观察与 1×1 图片没有视觉语义对应关系。
-
-```powershell
-.\.venv\Scripts\python.exe -m visionevidence.cli observe-retrieve --observation examples/observation_demo.json --image examples/vlm_demo_fixture.png --corpus examples/evidence_demo.jsonl --config configs/retrieval_bm25.toml --top-k 3 --request-id t043-demo-1 --dataset-name synthetic/demo --dataset-version 1 --split demo --output outputs/t043-demo-1
-```
-
-成功时 stdout 为完整 JSON，退出码 0；以下为字段摘录，不是完整结果：
-
-```json
-{"schema_version":1,"request_id":"t043-demo-1","status":"completed","verified":false,"is_mock":true,"inference_performed":false,"query":"flood road closures"}
-```
-
-候选证据顺序为 E001、E002、E004，包含 `document_id/source/text/score/metadata`。
-观察是合成输入；本阶段不接受待核验声明（manifest 的 `claim` 为 null）；候选证据只是词项匹配，
-不能据此得出真假。`verified=false` 表示未执行核验，绝不是“声明为假”；BM25 分数不是置信度。
-零命中仍为 `completed`、`evidence=[]`。`uncertainties` 不进入查询；仅中文无法构造查询时明确失败。
-
-运行目录必须不存在，每次换一个名称，不覆盖既有记录：
-
-- `observation.json`、`corpus.jsonl`、`image.png`、`config.toml`：实际使用的输入字节快照（扩展名随输入）。
-- `result.json`：现有 schema_version=1 完整结果，包括观察、查询来源、候选证据、VLM 响应与 trace。
-- `manifest.json`：状态、错误（若失败）、输入与结果 SHA-256、Git commit/dirty 状态、Python 源文件哈希、
-  软件包清单、CPU 平台、数据集声明、配置、样本数量和耗时。未测量内存记 null，不提供质量指标。
-
-运行错误在 stderr 输出 JSON，退出码 2；目录创建成功后的失败保留 manifest 和已读取的快照，
-不输出成功结果。参数语法错误仍沿用 argparse 帮助文本；目录创建失败时不能保存新 manifest。
-输入快照可能包含用户数据，应按原输入权限管理；输出目录默认被 Git 忽略。
-
-复现时使用 manifest 对应的代码版本、依赖清单及快照，原样重用 K/BM25 参数与数据集声明，
-仅更换 `--output` 路径。例如将上方 `--observation/--image/--corpus/--config` 分别指向旧运行目录的快照。
-观察、query、query_sources、候选证据及分数应一致；时间、绝对路径和运行环境字段不要求逐字节一致。
-随机种子为 null，因为本路径无随机采样；模型 revision 为 null，因为没有真实模型。
-Git dirty=true 表示包含未提交代码，不能仅凭 commit 复现，应保留对应源码并核对源码哈希。
-
-```powershell
-# 每次使用全新的 basetemp；pytest 会清空已存在的目录，不能指向实验记录。
-.\.venv\Scripts\python.exe -m pytest --basetemp outputs/pytest-t043-new-run
-```
-
-本演示仅验证工程链路，不代表模型视觉能力、真实检索效果或事实核验质量。
+实验输出独占新目录，不覆盖旧结果。Commit 经开发者授权，push 由开发者手动执行。

@@ -1,0 +1,18 @@
+{
+  "outputs\\t05-mock-scale-20261019-01\\state.sqlite3": {
+    "sha256": "a4ffd1bb40a8371fd42cc1cf81d8e57e7e12851fdd93a2fee07268b9b52ae661",
+    "bytes": 47292416
+  },
+  "outputs\\t05-mock-scale-20261019-01\\results-0003.jsonl": {
+    "sha256": "bc632484405ea471092db03626895550dd8241c4c490c33ac69009546e508303",
+    "bytes": 21865095
+  },
+  "outputs\\t05-recovery-20261019-01\\run\\state.sqlite3": {
+    "sha256": "c21913c82895a886c55927aa128e9e6f2d0f56ec58a3862899dca871f5f98ca0",
+    "bytes": 49152
+  },
+  "outputs\\verite-subset-20261019-01\\samples.jsonl": {
+    "sha256": "8515c7878f5b08940e28f97ff7ff86ee1ded3fe02f478e7c55fccfc4bec10a97",
+    "bytes": 12624
+  }
+}

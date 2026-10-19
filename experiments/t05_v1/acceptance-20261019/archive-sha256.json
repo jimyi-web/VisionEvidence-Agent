@@ -1,0 +1,13 @@
+{
+  "local-artifacts.json": "016fdd5194350767aeb49781d6a4b945bafcc40c46bda4e8c58514e65f4529e1",
+  "mock-manifest.json": "d6a537c65e215f76a807c5f601ceae8d171fff222c68ac7ee151149aa37cf4cc",
+  "mock-summary-0001.json": "4038c40be1a5b3c478f7e620d51016d2269bc9befe12d89c6a1be7a22ef9c368",
+  "mock-summary-0002.json": "9a9c02a1780928dda9c8b70b41a550a5449e2a13dcf9a1856ada8fe73e6b71ed",
+  "mock-summary-0003.json": "2cfe95db35f0229bf64b68758e82921212322ecb2adb6f913cb4ea5bae508297",
+  "recovery-manifest.json": "e05f124ed88fa0292074ef2ba6b8c602907fa641f97e0519c763e5fbecb0888e",
+  "recovery-summary-0001.json": "3c63faa8e8be8149248303ff5c60a40f6ab972de857549b0c64db8256d61ec22",
+  "recovery-summary-0002.json": "9adfebcbd0e8d71925b8b85084ba03c43ef90e5e36500e11ca0d8497c1bac145",
+  "validation.json": "2643fe349c716af3e10c8e9d3e9ef36c0cf0cee71a4b319cce8220b6408670e7",
+  "verite-source.json": "90e0a0163b44972fe4c75f95dd35459b67bbb88c29472dc37bec232d58f625e6",
+  "verite-subset.json": "3b1c3a558af87b84a1856c135f8d01acc0883989ad74cf2b09578cf11e709573"
+}

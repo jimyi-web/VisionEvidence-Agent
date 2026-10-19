@@ -1,0 +1,30 @@
+{
+  "revision": "snapshot-sha256:453fa6f76617a22edd8af7d568d8595a15f9a9fe700fb72dba800a6fe6c78254",
+  "upstream_commit": null,
+  "source_ref": "master",
+  "retrieved_utc": "2026-10-19T06:45:43.365055+00:00",
+  "files": {
+    "VERITE.csv": {
+      "url": "https://raw.githubusercontent.com/stevejpapad/image-text-verification/master/VERITE/VERITE.csv",
+      "bytes": 162347,
+      "sha256": "7f5661860f2e34624c1721710ed37fac5e1e78a4307400530dd587cb0d15a040"
+    },
+    "VERITE_articles.csv": {
+      "url": "https://raw.githubusercontent.com/stevejpapad/image-text-verification/master/VERITE/VERITE_articles.csv",
+      "bytes": 184717,
+      "sha256": "add4059c43dd796d512d9489358923263110a5e9430f1ea930dee0dfa5bc2197"
+    },
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/stevejpapad/image-text-verification/master/LICENSE",
+      "bytes": 11360,
+      "sha256": "f83c68b9ce20880bd7947fc2a2b68206fdaa97493c5d97f6685124f0cdcbbacb"
+    },
+    "README.md": {
+      "url": "https://raw.githubusercontent.com/stevejpapad/image-text-verification/master/README.md",
+      "bytes": 9360,
+      "sha256": "0557c26c66e94a14ba19032503bc29f3a17d2c58e219dec7cddb4706426e0fbb"
+    }
+  },
+  "images_downloaded": 0,
+  "usage": "research purposes only; see official README"
+}

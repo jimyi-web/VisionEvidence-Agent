@@ -17,7 +17,8 @@ The project combines:
 
 The primary goal is to build a technically credible AI research portfolio project, not merely a web application demo.
 
-Target milestone: November 2026.
+Short-term milestone: V1.0 for research internship applications by October 20, 2026.
+Long-term milestone: reproducible evaluation on 10,000+ queries; report corpus documents and real VLM image inference counts separately.
 
 ## 2. Roles and Responsibilities
 
@@ -333,7 +334,7 @@ Never claim a test passed unless it was actually executed.
 
 ## 14. Current Development Policy
 
-The project is currently in its initial setup stage.
+The project has completed T01–T04-5. The current priority is T05-A resumable batch evaluation and a small public-dataset adapter; large GPU runs remain follow-up work requiring explicit approval.
 
 Priorities:
 

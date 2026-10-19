@@ -1,0 +1,29 @@
+{
+  "dataset": "VERITE",
+  "official_repository": "https://github.com/stevejpapad/image-text-verification",
+  "revision": "snapshot-sha256:453fa6f76617a22edd8af7d568d8595a15f9a9fe700fb72dba800a6fe6c78254",
+  "inputs": {
+    "prepared_sha256": "7f5661860f2e34624c1721710ed37fac5e1e78a4307400530dd587cb0d15a040",
+    "articles_sha256": "add4059c43dd796d512d9489358923263110a5e9430f1ea930dee0dfa5bc2197"
+  },
+  "samples_sha256": "8515c7878f5b08940e28f97ff7ff86ee1ded3fe02f478e7c55fccfc4bec10a97",
+  "subset_rule": "first N official CSV records, no relabeling",
+  "requested_limit": 12,
+  "queries": 12,
+  "unique_image_paths": 8,
+  "available_images": 0,
+  "labels": {
+    "true": 4,
+    "miscaptioned": 4,
+    "out-of-context": 4
+  },
+  "evidence_documents": 0,
+  "real_vlm_image_calls": 0,
+  "retrieval_qrels": null,
+  "split_note": "benchmark only, not training/dev; keep article group together if splitting later",
+  "license": {
+    "repository": "Apache-2.0",
+    "dataset_instruction": "research purposes only",
+    "third_party_media": "not covered by assuming repository license; not downloaded"
+  }
+}

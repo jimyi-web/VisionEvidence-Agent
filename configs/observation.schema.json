@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "structured_visual_v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["objects", "visible_text", "uncertainties"],
+  "properties": {
+    "objects": {"$ref": "#/$defs/field"},
+    "visible_text": {"$ref": "#/$defs/field"},
+    "uncertainties": {"$ref": "#/$defs/field"}
+  },
+  "$defs": {
+    "field": {
+      "type": "array", "maxItems": 8,
+      "items": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\S"}
+    }
+  }
+}

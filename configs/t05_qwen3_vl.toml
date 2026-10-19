@@ -1,0 +1,14 @@
+# T05 always uses observation.PROMPT (structured_visual_v1), overriding this legacy prompt setting.
+# Local directory must already exist. No weights or GPU instances are downloaded/started.
+[vlm]
+backend = "qwen3_vl"
+model_name = "Qwen/Qwen3-VL-4B-Instruct"
+model_path = "/root/autodl-tmp/VisionEvidence-Agent/models/qwen3-vl-4b-instruct"
+device = "cuda:0"
+dtype = "bfloat16"
+max_new_tokens = 384
+do_sample = false
+max_image_size_mb = 10
+max_image_pixels = 20000000
+max_image_side = 1280
+prompt_version = "visual_observation_v1"

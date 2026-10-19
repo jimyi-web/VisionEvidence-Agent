@@ -5,3 +5,6 @@ experiments/t04_v1/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-a
 # These historical documents are byte-hashed by the human-review manifest.
 docs/t04_5_report.md -text
 docs/t04_5_reproduction.md -text
+# Preserve T05 receipt bytes and input/source fingerprints across Windows checkouts.
+experiments/t05_v1/** -text
+experiments/t05_v1/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

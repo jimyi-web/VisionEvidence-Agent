@@ -1,0 +1,17 @@
+{
+  "pytest": {
+    "passed": 352,
+    "seconds": 49.91,
+    "command": ".\\.venv\\Scripts\\python.exe -m pytest --basetemp outputs/pytest-t05-full-03",
+    "git_environment": {
+      "GIT_CONFIG_COUNT": "1",
+      "GIT_CONFIG_KEY_0": "safe.directory",
+      "GIT_CONFIG_VALUE_0": "D:/Research/VisionEvidence-Agent"
+    }
+  },
+  "pip_check": "No broken requirements found.",
+  "cli_version": "visionevidence 1.0.0",
+  "new_gpu_calls": 0,
+  "human_review_pairs_validated": 120,
+  "historical_gpu_archive_validated": true
+}
