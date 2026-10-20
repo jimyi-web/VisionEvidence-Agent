@@ -24,9 +24,10 @@ flowchart LR
 - 严格观察解析：拒绝截断/散文，保留失败原响应；不自动补造字段。
 - BM25：保留文档 ID、来源、原文、分数；独立 qrels 驱动端到端 Recall@K/MRR@K。
 - T05-A：流式 JSONL、稳定 ID、分批调度、SQLite 进度、断点、重试、成功缓存、输入/源码/模型哈希、Commit/环境追踪。
-- CPU/Mock 可本地运行；新多图结构化链路尚待真实 GPU 验收。
+- CPU/Mock 可本地运行；V1.1-A 新策略尚待独立真实 GPU 评测。
 - VERITE 适配器已用官方 CSV 小子集验证；真实图片受机构邮箱申请及条款限制。[数据选择](docs/t05_datasets.md)。
-- Flickr8k 真实图片 proxy：已取得 test 前 20 张 JPEG，保留 6000/1000/1000 原划分与每图五条描述；两路共享 5,000 条 test 候选，CPU/Mock 端到端和恢复已通过，真实 GPU 由开发者手动验收。[协议](docs/flickr8k_protocol.md)、[下载/离线/GPU 命令](docs/flickr8k_runbook.md)、[验收报告](docs/flickr8k_report.md)。
+- Flickr8k V1.0 真实 GPU：20 张独立图片、40 次 Qwen 调用、5,000 条候选描述；Baseline Hit@10=0.65、Structured=0.35，后者有五条失败，当前没有检索提升。[GPU 审计报告](docs/flickr8k_real_gpu_3ec02ca_report.md)。
+- V1.1-A：格式约束与视觉信息保留独立开关、严格失败拒绝、全 attempts 导出和离线 dev/test 队列已实现；只有 CPU/Mock 验收，未宣称真实性能改善。[实现、dev/test 方案、GPU 命令与预算](docs/v11a_implementation_and_protocol.md)。
 
 ## 已有实验与边界
 
@@ -39,7 +40,9 @@ flowchart LR
 | T04-5 人工辅助审核 | 12 | 同一 10 个场景 | 0 | 120 个样本-文档关系，非 120 个查询或图片 |
 | T05 CPU/Mock 分阶段 | 5 | 100 → 1,000 → 10,000 | 0 | 验证调度/缓存/恢复；复用 1 个合成白像素 fixture，不代表万张真实图片 |
 | VERITE 元数据子集 | 0 | 12 条配对记录 | 0 | 8 图片路径、本地图片 0，非检索效果实验 |
-| Flickr8k 真实 JPEG + Mock | 5,000 条候选描述 | 20 图片查询/路，共 40 查询槽位 | 0 | 20 张真实图已解码；Mock 不分析像素，尚无真实 VLM 质量指标 |
+| Flickr8k 真实 JPEG + Mock | 5,000 条候选描述 | 20 图片查询/路，共 40 查询槽位 | 0 | 20 张真实图已解码；本行 Mock 不提供视觉质量指标 |
+| Flickr8k V1.0 GPU | 5,000 条候选描述 | 20 图片查询/路，40 槽位 | 40 次，独立图 20 张 | Structured 15/20 成功，Hit@10=0.35，弱于 Baseline 0.65；失败计零 |
+| V1.1-A 合成 CPU/Mock | 10 条合成描述 | 合成 dev 两图，四种配对消融及续跑 | 0 | 验证接口、严格拒绝、缓存和来源，不代表检索改善 |
 
 T04 固定合成集主结果（宏平均 n=9，非空 qrels 的查询失败记零）：
 
@@ -83,19 +86,19 @@ $env:GIT_CONFIG_VALUE_0='D:/Research/VisionEvidence-Agent'
 .\.venv\Scripts\python.exe -m visionevidence.batch --mode mock --samples outputs/t05-input-new.jsonl --corpus examples/evidence_demo.jsonl --output outputs/t05-run-new --limit 10000 --batch-size 512 --resume
 ```
 
-输出含固定 manifest、输入快照、state.sqlite3、每阶段独立 summary/results。错误和原响应查 attempts；--max-attempts 默认 2，是跨 session 累计预算，修复缺图后可显式提高，成功结果不覆盖。退出码 0=所选样本完成，1=有未完成样本，2=配置/输入/目录错误。
+输出含固定 manifest、输入快照、state.sqlite3、每阶段独立 summary/results，以及包含失败/原响应的 attempts JSONL。--max-attempts 默认 2，是跨 session 累计预算，修复缺图后可显式提高，成功结果不覆盖；V1.1 受控实验显式设为 1。退出码 0=所选样本完成，1=有未完成样本，2=配置/输入/目录错误。
 
 prompt、源码、证据库、配置或模型改变要新目录；成功图片哈希变化拒绝缓存。batch-size 是调度大小，GPU 逐图推理。[输入/qrels/恢复协议与 GPU 小批命令](docs/t05_pipeline.md)、[本轮验收](docs/t05_report.md)。
 
 ## 真实数据与 GPU 下一步
 
-VERITE 图片申请 PENDING 时，当前优先用 Flickr8k 做 **image-to-caption retrieval proxy**。20 张真实图片已获取，候选库固定为 test 的 5,000 条人工描述；正确描述只作为检索目标，不进入 VLM prompt。配对 qrels 显式标记 caption_pair_proxy，不用于外部事实核验。当前完整测试 **371 passed**。
+VERITE 图片申请 PENDING 时，当前优先用 Flickr8k 做 **image-to-caption retrieval proxy**。20 张真实 test 图片已经完成 V1.0 GPU 运行及审计，现在仅作诊断集。正确描述只作为检索目标，不进入 VLM prompt。配对 qrels 显式标记 caption_pair_proxy，不用于外部事实核验。V1.1-A 当前完整 CPU 测试 **418 passed**。
 
 ```powershell
 .\.venv\Scripts\python.exe -m visionevidence.caption_experiment --dataset data/processed/flickr8k-proxy-v1/test --output outputs/flickr8k-mock-new --mode mock --limit 20
 ```
 
-运行前按 [Flickr8k runbook](docs/flickr8k_runbook.md) 下载/离线适配。后续 20→100→1000 仅扩大同一个 test 查询前缀，候选库不变；8,000 图按 train/dev/test 分开运行。指标是同图描述关联命中率/召回率，不能称为谣言识别准确率；相似图片的描述可能也是合理答案，五条同图描述也不是独立图片样本。
+上面的 Mock 命令仅作历史诊断；[V1.0 runbook](docs/flickr8k_runbook.md) 保留历史复现方式。V1.1 按 [新方案](docs/v11a_implementation_and_protocol.md) 在原 dev 前二十图选择策略，冻结方法后评测原 test 第 21–120 图，各自候选库固定为原 split 的 5,000 条描述；不再把 test 前二十图作为独立测试。指标不能称为谣言识别准确率；相似图描述可能相关，五条同图描述也不是独立图片样本。
 
 按 [VERITE 元数据步骤](docs/t05_datasets.md) 接入，再经 [官方 HF](https://huggingface.co/datasets/stefpapad/VERITE) 申请图片；保留图片哈希与条款。当前官方 CSV 和论文总数差 1 条，适配器按实际字节原样保留。
 

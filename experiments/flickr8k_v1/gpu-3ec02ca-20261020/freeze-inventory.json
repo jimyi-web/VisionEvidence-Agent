@@ -1,0 +1,119 @@
+{
+  "archive": "outputs/flickr8k-real-3ec02ca-01.tar.gz",
+  "archive_bytes": 711336,
+  "archive_sha256": "4708eb995f12cc0986a3f274eaf9fb58f499dea41e913ff77cbf72a2cfd15b06",
+  "files": {
+    ".experiment.lock": {
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    "baseline/.lock": {
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    "baseline/input-corpus.jsonl": {
+      "bytes": 1914510,
+      "sha256": "b4b7afafa6046c3deb72606709126ce2b9e6bb24b224594b0c6835159047011a"
+    },
+    "baseline/input-qrels.jsonl": {
+      "bytes": 426650,
+      "sha256": "d816992eb149f2d5221198c579731e3a2a6ea28a83ee6418cf01f86aa0c0a2a0"
+    },
+    "baseline/input-samples.jsonl": {
+      "bytes": 529325,
+      "sha256": "608afd66bc9e87c4440d5eaab269c3af8f890323e51b14f45fa66e3235766f68"
+    },
+    "baseline/manifest.json": {
+      "bytes": 9406,
+      "sha256": "ccdf8156ceb8bcaa1fb9127e10a9b9e45466350517f15367d16581c359faea86"
+    },
+    "baseline/results-0001.jsonl": {
+      "bytes": 13968,
+      "sha256": "5d7f081bef30507a3593a511191aca537f84112b3e4ea907ae61404eccbcea83"
+    },
+    "baseline/results-0002.jsonl": {
+      "bytes": 140934,
+      "sha256": "e2f56691548a12ff8579fcaad6ccac4dc71fd8f82f37741c9239152cb8c4035d"
+    },
+    "baseline/runtime-0001.json": {
+      "bytes": 207,
+      "sha256": "c2ccffaad6bcdec5de70266c42920a82931ca1b9bb69f2fc2abbae4667d922d1"
+    },
+    "baseline/runtime-0002.json": {
+      "bytes": 207,
+      "sha256": "c2ccffaad6bcdec5de70266c42920a82931ca1b9bb69f2fc2abbae4667d922d1"
+    },
+    "baseline/state.sqlite3": {
+      "bytes": 1388544,
+      "sha256": "c74c316f07f4349f1f0f74fac1cea68b7f61bdf44a17d7b532bbc56fcea7fc36"
+    },
+    "baseline/summary-0001.json": {
+      "bytes": 977,
+      "sha256": "761652dc5700d66dd696c1534d17efb8afad427290e1654eba64d895bad53e4f"
+    },
+    "baseline/summary-0002.json": {
+      "bytes": 989,
+      "sha256": "e608d7f863f9ae7c1b53b04daf8bb5b939275830e965bd1b2ba6b78f194080eb"
+    },
+    "comparison-0001.json": {
+      "bytes": 4669,
+      "sha256": "96e9759951962eea6be5881ed397644e84a2e86f7eb9235dca4ee69bdc2b8b56"
+    },
+    "comparison-0002.json": {
+      "bytes": 14460,
+      "sha256": "ddaa4981ab495bfc33c184d62878409e9a9d3438bb0145509d612b95558f3b32"
+    },
+    "experiment.json": {
+      "bytes": 180,
+      "sha256": "08ccbc52494c3f9bce7ab01c98b82284c08bc540e8a8a2ed328e626a4133ddd9"
+    },
+    "structured/.lock": {
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    "structured/input-corpus.jsonl": {
+      "bytes": 1914510,
+      "sha256": "b4b7afafa6046c3deb72606709126ce2b9e6bb24b224594b0c6835159047011a"
+    },
+    "structured/input-qrels.jsonl": {
+      "bytes": 426650,
+      "sha256": "d816992eb149f2d5221198c579731e3a2a6ea28a83ee6418cf01f86aa0c0a2a0"
+    },
+    "structured/input-samples.jsonl": {
+      "bytes": 529325,
+      "sha256": "608afd66bc9e87c4440d5eaab269c3af8f890323e51b14f45fa66e3235766f68"
+    },
+    "structured/manifest.json": {
+      "bytes": 9352,
+      "sha256": "efecac10d32e42465571cb2d4ef0033b64ab3e0c5e4cfdce8b82f905e0192f66"
+    },
+    "structured/results-0001.jsonl": {
+      "bytes": 13656,
+      "sha256": "82c18702ac0aa5f230b250acad42d603c8f41e199b5ae5ed9ffaba71a3172010"
+    },
+    "structured/results-0002.jsonl": {
+      "bytes": 102373,
+      "sha256": "d89725770207462878c3604eebb1f5e1b9d8d9b06b859b2cadd97ee643f95e20"
+    },
+    "structured/runtime-0001.json": {
+      "bytes": 207,
+      "sha256": "c2ccffaad6bcdec5de70266c42920a82931ca1b9bb69f2fc2abbae4667d922d1"
+    },
+    "structured/runtime-0002.json": {
+      "bytes": 207,
+      "sha256": "c2ccffaad6bcdec5de70266c42920a82931ca1b9bb69f2fc2abbae4667d922d1"
+    },
+    "structured/state.sqlite3": {
+      "bytes": 1351680,
+      "sha256": "e4f734cc678b96c5a5b537fd3302e5ad32f15b5664dabbb04179a67291a2a8c9"
+    },
+    "structured/summary-0001.json": {
+      "bytes": 980,
+      "sha256": "4c003ed1ca0a1d802554f4ce6440d62bf3892f8ce27e7d88db0368c614ad25c4"
+    },
+    "structured/summary-0002.json": {
+      "bytes": 1018,
+      "sha256": "cef1b6bce104861fdcee524ba6bd65d7ef5847fde78cc0e9a0e3a1ba1c2a24ae"
+    }
+  }
+}

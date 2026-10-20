@@ -6,6 +6,7 @@ import json
 from time import perf_counter
 
 from visionevidence.retrieval.bm25 import BM25Index, TOKENIZER, tokenize, validate_k
+from visionevidence.observation_policy import ObservationPolicy, V10_POLICY
 from visionevidence.vlm.base import BaseVLM
 from visionevidence.vlm.schemas import VLMRequest
 
@@ -75,11 +76,13 @@ def build_query(observation: VisualObservation) -> tuple[str, list[dict]]:
     return query, sources
 
 
-def observe_and_retrieve(request: VLMRequest, vlm: BaseVLM, index: BM25Index, *, k: int = 3) -> dict:
+def observe_and_retrieve(request: VLMRequest, vlm: BaseVLM, index: BM25Index, *, k: int = 3,
+                         policy: ObservationPolicy = V10_POLICY) -> dict:
     """One VLM call, then at most one search. Errors propagate; no fallback/retry."""
     validate_k(k)
-    if request.request_id is None or request.prompt != PROMPT:
-        raise ValueError("a request_id and the structured_visual_v1 prompt are required")
+    effective_prompt = policy.prompt(PROMPT)
+    if request.request_id is None or request.prompt != effective_prompt:
+        raise ValueError(f"a request_id and the {policy.prompt_version} prompt are required")
     request.validate_image()
     image_hash = hashlib.sha256(request.image_path.read_bytes()).hexdigest()
     started = perf_counter()
@@ -97,6 +100,7 @@ def observe_and_retrieve(request: VLMRequest, vlm: BaseVLM, index: BM25Index, *,
         if generated >= limit:
             raise ValueError("token limit reached; structured observation rejected")
     observation = parse_observation(response.description)
+    policy.validate(observation)
     query, sources = build_query(observation)
     started = perf_counter()
     evidence = index.search(query, k=k)
@@ -108,8 +112,9 @@ def observe_and_retrieve(request: VLMRequest, vlm: BaseVLM, index: BM25Index, *,
         "observation": {key: list(value) for key, value in asdict(observation).items()},
         "query": query, "query_sources": sources,
         "evidence": [asdict(item) for item in evidence], "vlm_response": response.to_dict(),
-        "trace": {"image_sha256": image_hash, "prompt_version": PROMPT_VERSION,
-                  "prompt_sha256": hashlib.sha256(PROMPT.encode("utf-8")).hexdigest(),
+        "trace": {"image_sha256": image_hash, "prompt_version": policy.prompt_version,
+                  "prompt_sha256": hashlib.sha256(effective_prompt.encode("utf-8")).hexdigest(),
+                  "observation_policy": policy.identity(),
                   "k": k, "bm25": {"k1": index.k1, "b": index.b, "tokenizer": TOKENIZER},
                   "vlm_wall_ms": vlm_wall_ms, "retrieval_ms": retrieval_ms},
     }

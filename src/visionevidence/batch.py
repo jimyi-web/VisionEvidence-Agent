@@ -6,6 +6,7 @@ The batch size bounds scheduling, not GPU tensor batching. No labels enter queri
 import argparse
 from contextlib import closing, contextmanager
 from dataclasses import asdict
+from functools import partial
 from datetime import datetime, timezone
 import hashlib
 import importlib.metadata
@@ -19,7 +20,8 @@ import subprocess
 import sys
 from time import perf_counter
 
-from visionevidence.observation import PROMPT, PROMPT_VERSION, observe_and_retrieve
+from visionevidence.observation import PROMPT, observe_and_retrieve
+from visionevidence.observation_policy import ObservationPolicy, V10_POLICY, load_observation_policy
 from visionevidence.evaluation.retrieval import metrics_at_k
 from visionevidence.retrieval.bm25 import BM25Index
 from visionevidence.retrieval.corpus import load_corpus, read_jsonl
@@ -90,7 +92,8 @@ class StructuredMock:
     """Fixed synthetic observation; never derives visual content from a caption."""
     def generate(self, request):
         request.validate_image()
-        if request.prompt != PROMPT:
+        structured_prompts = {ObservationPolicy(f, d).prompt(PROMPT) for f in (False, True) for d in (False, True)}
+        if request.prompt not in structured_prompts:
             return VLMResponse(request.request_id, "[MOCK] A road sign. No image analysis performed.",
                                "structured-mock-v1", "mock", True, 0.0,
                                {"inference_performed": False, "verified": False,
@@ -202,7 +205,8 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
               limit: int = 100, batch_size: int = 32, max_attempts: int = 2,
               resume: bool = False, top_k: int = 3, k1: float = 1.5, b: float = 0.75,
               qrels: Path | None = None, backend_factory=None, progress: bool = False,
-              query_mode: str = "structured", task: str = "evidence_retrieval") -> dict:
+              query_mode: str = "structured", task: str = "evidence_retrieval",
+              observation_policy: ObservationPolicy = V10_POLICY) -> dict:
     """Fixed dataset, growing prefix. max_attempts is a lifetime per-sample budget.
 
     Increasing it explicitly on resume permits recovery after repairing missing images.
@@ -217,10 +221,12 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
         raise ValueError("query_mode must be structured or baseline")
     if task not in {"evidence_retrieval", "image_to_caption_retrieval_proxy"}:
         raise ValueError("unsupported retrieval task")
+    if query_mode == "baseline" and observation_policy != V10_POLICY:
+        raise ValueError("observation policy applies only to structured queries")
     from visionevidence.description import PROMPT as BASELINE_PROMPT, PROMPT_VERSION as BASELINE_VERSION, describe_and_retrieve
-    effective_prompt = PROMPT if query_mode == "structured" else BASELINE_PROMPT
-    prompt_version = PROMPT_VERSION if query_mode == "structured" else BASELINE_VERSION
-    processor = observe_and_retrieve if query_mode == "structured" else describe_and_retrieve
+    effective_prompt = observation_policy.prompt(PROMPT) if query_mode == "structured" else BASELINE_PROMPT
+    prompt_version = observation_policy.prompt_version if query_mode == "structured" else BASELINE_VERSION
+    processor = partial(observe_and_retrieve, policy=observation_policy) if query_mode == "structured" else describe_and_retrieve
     if config.do_sample:
         raise ValueError("batch v1 requires deterministic do_sample=false")
     index = BM25Index(load_corpus(corpus), k1=k1, b=b)
@@ -242,6 +248,7 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
                 "vlm_config": effective_config,
                 "effective_prompt": effective_prompt, "effective_prompt_version": prompt_version,
                 "query_mode": query_mode, "task": task,
+                "observation_policy": observation_policy.identity() if query_mode == "structured" else None,
                 "source_sha256": code["source_sha256"], "model_file_sha256": model_files,
                 "retrieval": {"top_k": top_k, "k1": k1, "b": b}, "seed": 0}
     if resume:
@@ -383,6 +390,7 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
                     print(dumps({"session": session, "processed_prefix": position, "target": limit}), file=sys.stderr, flush=True)
             report = summary(db, limit, len(index.document_ids), config.backend, top_k)
             report.update({"task": task, "query_mode": query_mode})
+            report["observation_policy"] = identity["observation_policy"]
             if task == "image_to_caption_retrieval_proxy":
                 report["qrels_status"] = "same-image caption association proxy; not independent relevance or factual truth"
             report.update({"session": session, "elapsed_seconds": perf_counter() - started,
@@ -393,6 +401,16 @@ def run_batch(*, samples: Path, corpus: Path, output: Path, config: VLMConfig | 
             with (output / f"results-{session:04d}.jsonl").open("x", encoding="utf-8") as stream:
                 for result, in db.execute("SELECT result FROM samples WHERE position<=? AND status='completed' ORDER BY position", (limit,)):
                     stream.write(result + "\n")
+            # Separate cumulative attempt export includes failures and exact raw output.
+            with (output / f"attempts-{session:04d}.jsonl").open("x", encoding="utf-8") as stream:
+                cursor = db.execute("SELECT a.* FROM attempts a JOIN samples s ON s.id=a.sample_id "
+                                    "WHERE s.position<=? ORDER BY a.id", (limit,))
+                names = [column[0] for column in cursor.description]
+                for values in cursor:
+                    record = dict(zip(names, values))
+                    if record["raw_response"] is not None:
+                        record["raw_response"] = json.loads(record["raw_response"])
+                    stream.write(dumps(record) + "\n")
             with db:
                 db.execute("UPDATE sessions SET finished=?,summary=? WHERE id=?", (now(), dumps(report), session))
             return report
@@ -408,6 +426,7 @@ def main(argv=None):
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--max-attempts", type=int, default=2)
+    parser.add_argument("--observation-config", type=Path, help="Versioned structured prompt ablations; default V1.0")
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--k1", type=float, default=1.5)
     parser.add_argument("--b", type=float, default=0.75)
@@ -422,7 +441,8 @@ def main(argv=None):
         report = run_batch(samples=args.samples, corpus=args.corpus, output=args.output, config=config,
                            limit=args.limit, batch_size=args.batch_size, max_attempts=args.max_attempts,
                            resume=args.resume, top_k=args.top_k, k1=args.k1, b=args.b, qrels=args.qrels, progress=True,
-                           query_mode=args.query_mode, task=args.task)
+                           query_mode=args.query_mode, task=args.task,
+                           observation_policy=load_observation_policy(args.observation_config))
         print(dumps(report))
         return 0 if report["status"] == "completed" else 1
     except (OSError, ValueError, TypeError, sqlite3.Error) as exc:

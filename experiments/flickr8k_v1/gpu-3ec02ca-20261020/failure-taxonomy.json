@@ -1,0 +1,95 @@
+[
+  {
+    "sample_id": "flickr8k:1082379191_ec1e53f996.jpg",
+    "attempt_id": 3,
+    "error_type": "ValueError",
+    "error": "token limit reached; structured observation rejected",
+    "checks": {
+      "generated_tokens": 384,
+      "max_new_tokens": 384,
+      "token_limit_reached": true,
+      "json_valid": false,
+      "schema_valid": false,
+      "query_valid": false,
+      "json_error": "Unterminated string starting at: line 1 column 1108 (char 1107)",
+      "schema_or_query_error": "invalid observation JSON: Unterminated string starting at: line 1 column 1108 (char 1107)",
+      "category": "token_limit"
+    }
+  },
+  {
+    "sample_id": "flickr8k:115684808_cb01227802.jpg",
+    "attempt_id": 13,
+    "error_type": "ValueError",
+    "error": "objects must contain at most 8 items as a tuple",
+    "checks": {
+      "generated_tokens": 38,
+      "max_new_tokens": 384,
+      "token_limit_reached": false,
+      "json_valid": true,
+      "schema_valid": false,
+      "query_valid": false,
+      "field_lengths": {
+        "objects": 9,
+        "visible_text": 0,
+        "uncertainties": 0
+      },
+      "schema_or_query_error": "objects must contain at most 8 items as a tuple",
+      "category": "schema"
+    }
+  },
+  {
+    "sample_id": "flickr8k:1174629344_a2e1a2bdbf.jpg",
+    "attempt_id": 16,
+    "error_type": "ValueError",
+    "error": "objects must contain at most 8 items as a tuple",
+    "checks": {
+      "generated_tokens": 110,
+      "max_new_tokens": 384,
+      "token_limit_reached": false,
+      "json_valid": true,
+      "schema_valid": false,
+      "query_valid": false,
+      "field_lengths": {
+        "objects": 17,
+        "visible_text": 1,
+        "uncertainties": 3
+      },
+      "schema_or_query_error": "objects must contain at most 8 items as a tuple",
+      "category": "schema"
+    }
+  },
+  {
+    "sample_id": "flickr8k:1224851143_33bcdd299c.jpg",
+    "attempt_id": 18,
+    "error_type": "ValueError",
+    "error": "token limit reached; structured observation rejected",
+    "checks": {
+      "generated_tokens": 384,
+      "max_new_tokens": 384,
+      "token_limit_reached": true,
+      "json_valid": false,
+      "schema_valid": false,
+      "query_valid": false,
+      "json_error": "Expecting value: line 1 column 1303 (char 1302)",
+      "schema_or_query_error": "invalid observation JSON: Expecting value: line 1 column 1303 (char 1302)",
+      "category": "token_limit"
+    }
+  },
+  {
+    "sample_id": "flickr8k:1237985362_dbafc59280.jpg",
+    "attempt_id": 19,
+    "error_type": "ValueError",
+    "error": "token limit reached; structured observation rejected",
+    "checks": {
+      "generated_tokens": 384,
+      "max_new_tokens": 384,
+      "token_limit_reached": true,
+      "json_valid": false,
+      "schema_valid": false,
+      "query_valid": false,
+      "json_error": "Unterminated string starting at: line 1 column 1322 (char 1321)",
+      "schema_or_query_error": "invalid observation JSON: Unterminated string starting at: line 1 column 1322 (char 1321)",
+      "category": "token_limit"
+    }
+  }
+]

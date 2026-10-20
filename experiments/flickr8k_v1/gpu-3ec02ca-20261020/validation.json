@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "audit_validation": {
+    "archive_members_match": true,
+    "sqlite_integrity": "ok in both branches",
+    "local_source_hashes_match": true,
+    "comparison_summary_db_exports_match": true,
+    "input_snapshot_hashes_match": true,
+    "qrels_snapshot_db_match": true,
+    "original_queries_replayed_cpu": 35,
+    "gpu_calls_during_audit": 0,
+    "unchanged_after_audit": true
+  },
+  "final_test_command": ".\\.venv\\Scripts\\python.exe -m pytest tests\\test_flickr8k_gpu_audit.py tests\\test_flickr8k.py -q --basetemp outputs\\pytest-flickr8k-gpu-audit-20261020-02 --junitxml=outputs\\pytest-flickr8k-gpu-audit-20261020-02.xml",
+  "pytest": {
+    "tests": 17,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "pytest_reported_seconds": 0.79,
+  "junit_path": "outputs/pytest-flickr8k-gpu-audit-20261020-02.xml",
+  "junit_sha256": "9991b41ff4ee521173a80065b0eb461393e81cbe78b0c2e5e70bef48b4400d64",
+  "existing_output_rejected": true,
+  "separate_cpu_audits_match": true,
+  "local_image_hashes_verified": 20,
+  "visually_inspected_positions": [
+    1,
+    4,
+    5,
+    7,
+    8,
+    12,
+    15,
+    17
+  ],
+  "original_files_unchanged_after_final_checks": true,
+  "git_diff_check_exit_code": 0,
+  "new_gpu_calls": 0
+}

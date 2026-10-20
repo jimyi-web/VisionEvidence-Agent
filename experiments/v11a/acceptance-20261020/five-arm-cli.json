@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "purpose": "five-arm CLI and documented CPU scoring smoke on synthetic inputs",
+  "arms": [
+    "baseline",
+    "v10_control",
+    "format_only",
+    "details_only",
+    "format_details"
+  ],
+  "images_per_arm": 2,
+  "mock_calls": 10,
+  "real_gpu_calls": 0,
+  "comparison_controls_equal": true,
+  "full_denominator_preserved": true,
+  "output": "outputs/v11a-five-arm-cli-20261020-01"
+}

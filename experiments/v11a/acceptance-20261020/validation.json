@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "test_command": ".\\.venv\\Scripts\\python.exe -m pytest -q --basetemp outputs/pytest-v11a-full-20261020-02 --junitxml=outputs/pytest-v11a-full-20261020-02.xml",
+  "test_subprocess_env": "append safe.directory via GIT_CONFIG_COUNT/KEY_n/VALUE_n for this repository only; no global git config changes",
+  "tests": {
+    "tests": 418,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "pytest_reported_seconds": 54.74,
+  "junit_sha256": "44653123bdf95e801e7b18d16723a3a774dbd9628310b2162c352d44ebdba0f4",
+  "first_full_run": {
+    "passed": 414,
+    "failed": 4,
+    "reason": "legacy Git provenance reads blocked by dubious ownership; rerun with process-scoped safe.directory"
+  },
+  "synthetic_mock_acceptance": "four policy pairs on two synthetic dev images, then cache-only resume",
+  "legacy_prompt_sha256": "dde82bfda2d224991529b789abbabeae1cce72d8caf3ea8d2d401c41101cd0e6",
+  "v10_archive_and_28_files_unchanged": true,
+  "pip_check": "No broken requirements found.",
+  "real_gpu_calls_this_task": 0,
+  "model_downloads_this_task": 0,
+  "new_image_downloads_this_task": 0,
+  "performance_improvement_claimed": false
+}

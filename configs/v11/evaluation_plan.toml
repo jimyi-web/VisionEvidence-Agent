@@ -1,0 +1,28 @@
+# A protocol plan, not a VLM or observation CLI config. No strategy selected yet.
+protocol_version = "flickr8k_v11a_plan_v1"
+dataset_revision = "c7a02cb487da0eca729e133194b0f842cb578c08"
+task = "image_to_caption_retrieval_proxy"
+selected_strategy = "pending_dev_selection"
+seed = 0
+max_new_tokens = 384
+max_attempts = 1
+selection_rule = "original ascending filenames, independent of captions and results"
+
+[development]
+split = "dev"
+offset = 0
+limit = 20
+candidate_documents = 5000
+arms = ["baseline", "v10_control", "format_only", "details_only", "format_details"]
+selection_gate = "20/20 workflow success; then highest Hit@10, MRR@10, lowest generated tokens; exact tie prefers fewer switches then format_only"
+failure_policy = "all selected images in denominator; failed or pending score zero"
+
+[independent_test]
+split = "test"
+offset = 20
+limit = 100
+candidate_documents = 5000
+excluded_diagnostic_positions = "1..20"
+requires_prior_method_freeze = true
+arms = ["baseline", "frozen_selected_strategy"]
+test_feedback_for_strategy_selection = false

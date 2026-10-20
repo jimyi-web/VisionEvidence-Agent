@@ -1,0 +1,5 @@
+# Exact legacy prompt/schema/query behavior. No V1.1 switches enabled.
+[observation]
+config_version = "observation_policy_v1"
+format_constraints = false
+retain_visual_details = false

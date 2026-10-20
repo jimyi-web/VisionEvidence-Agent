@@ -13,6 +13,7 @@ import sys
 from visionevidence.batch import StructuredMock, dumps, now, run_batch, run_lock, sha256
 from visionevidence.datasets.flickr8k import TASK
 from visionevidence.evaluation.retrieval import metrics_at_k
+from visionevidence.observation_policy import ObservationPolicy, V10_POLICY, load_observation_policy
 from visionevidence.vlm.factory import VLMConfig, create_vlm, load_vlm_config
 
 
@@ -47,7 +48,8 @@ def score_branch(path: Path, limit: int, cutoffs: tuple[int, ...]) -> dict:
 def run_experiment(*, dataset: Path, output: Path, config: VLMConfig | None = None,
                    limit: int = 20, batch_size: int = 4, max_attempts: int = 1,
                    resume: bool = False, cutoffs: tuple[int, ...] = (1, 5, 10),
-                   backend_factory=None, progress: bool = False) -> dict:
+                   backend_factory=None, progress: bool = False,
+                   observation_policy: ObservationPolicy = V10_POLICY) -> dict:
     dataset, output = Path(dataset).resolve(), Path(output).resolve()
     if not cutoffs or any(type(k) is not int or k <= 0 for k in cutoffs) or len(cutoffs) != len(set(cutoffs)):
         raise ValueError("cutoffs must be distinct positive integers")
@@ -63,7 +65,8 @@ def run_experiment(*, dataset: Path, output: Path, config: VLMConfig | None = No
     if type(limit) is not int or not 0 < limit <= split["images"]:
         raise ValueError("limit must fit the selected original split; 8000 requires separate train/dev/test runs")
     identity = {"task": TASK, "adapter_manifest_sha256": sha256(adapter_manifest),
-                "split": dataset.name, "cutoffs": list(cutoffs)}
+                "split": dataset.name, "cutoffs": list(cutoffs),
+                "observation_policy": observation_policy.identity()}
     if resume:
         if json.loads((output / "experiment.json").read_text(encoding="utf-8")) != identity:
             raise ValueError("proxy protocol identity changed")
@@ -85,6 +88,7 @@ def run_experiment(*, dataset: Path, output: Path, config: VLMConfig | None = No
                 qrels=dataset / "qrels.jsonl", output=branch, config=config, limit=limit,
                 batch_size=batch_size, max_attempts=max_attempts, top_k=max(cutoffs),
                 task=TASK, query_mode=mode, backend_factory=shared_backend,
+                observation_policy=observation_policy if mode == "structured" else V10_POLICY,
                 resume=resume and (branch / "manifest.json").exists(), progress=progress)
             scores[mode] = score_branch(branch, limit, cutoffs)
         # Explicitly verify comparison controls rather than trust caller settings.
@@ -101,6 +105,8 @@ def run_experiment(*, dataset: Path, output: Path, config: VLMConfig | None = No
         result = {"task": TASK, "verified": False, "is_mock": config.backend == "mock", "backend": config.backend,
                   "status": "completed" if all(b["status"] == "completed" for b in branches.values()) else "incomplete",
                   "created_utc": now(), "original_split": dataset.name,
+                  "cohort": manifest.get("cohort"),
+                  "observation_policy": observation_policy.identity(),
                   "scale": {"candidate_caption_documents": split["candidate_caption_documents"],
                             "evaluation_images": limit, "retrieval_query_slots": 2 * limit,
                             "real_vlm_image_calls": sum(b["scale"]["real_vlm_image_calls"] for b in branches.values()),
@@ -128,6 +134,7 @@ def main(argv=None):
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--max-attempts", type=int, default=1)
+    parser.add_argument("--observation-config", type=Path, help="Structured ablation config; default V1.0")
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args(argv)
     try:
@@ -135,7 +142,8 @@ def main(argv=None):
         if config.backend != args.mode:
             raise ValueError("mode/config mismatch; no automatic mock fallback")
         result = run_experiment(dataset=args.dataset, output=args.output, config=config, limit=args.limit,
-                               batch_size=args.batch_size, max_attempts=args.max_attempts, resume=args.resume, progress=True)
+                               batch_size=args.batch_size, max_attempts=args.max_attempts, resume=args.resume, progress=True,
+                               observation_policy=load_observation_policy(args.observation_config))
         # Full per-query metrics are in the immutable comparison JSON, not the console.
         print(dumps({key: result[key] for key in ("task", "status", "is_mock", "scale")}))
         return 0 if result["status"] == "completed" else 1

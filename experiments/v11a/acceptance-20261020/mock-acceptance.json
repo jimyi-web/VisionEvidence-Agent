@@ -1,0 +1,94 @@
+{
+  "purpose": "synthetic CPU/Mock interface acceptance only; no visual quality measurement",
+  "real_vlm_calls": 0,
+  "runs": {
+    "v10_control": {
+      "status": "completed",
+      "policy": {
+        "config_version": "observation_policy_v1",
+        "format_constraints": false,
+        "retain_visual_details": false,
+        "prompt_version": "structured_visual_v1",
+        "schema_version": "visual_observation_v1",
+        "query_builder_version": "objects_visible_text_ascii_v1"
+      },
+      "branches": {
+        "baseline": {
+          "successful": 2,
+          "attempts": 2
+        },
+        "structured": {
+          "successful": 2,
+          "attempts": 2
+        }
+      },
+      "resume_added_attempts": 0
+    },
+    "format_only": {
+      "status": "completed",
+      "policy": {
+        "config_version": "observation_policy_v1",
+        "format_constraints": true,
+        "retain_visual_details": false,
+        "prompt_version": "structured_visual_v11a_format",
+        "schema_version": "visual_observation_v1",
+        "query_builder_version": "objects_visible_text_ascii_v1"
+      },
+      "branches": {
+        "baseline": {
+          "successful": 2,
+          "attempts": 2
+        },
+        "structured": {
+          "successful": 2,
+          "attempts": 2
+        }
+      },
+      "resume_added_attempts": 0
+    },
+    "details_only": {
+      "status": "completed",
+      "policy": {
+        "config_version": "observation_policy_v1",
+        "format_constraints": false,
+        "retain_visual_details": true,
+        "prompt_version": "structured_visual_v11a_details",
+        "schema_version": "visual_observation_v1",
+        "query_builder_version": "objects_visible_text_ascii_v1"
+      },
+      "branches": {
+        "baseline": {
+          "successful": 2,
+          "attempts": 2
+        },
+        "structured": {
+          "successful": 2,
+          "attempts": 2
+        }
+      },
+      "resume_added_attempts": 0
+    },
+    "format_details": {
+      "status": "completed",
+      "policy": {
+        "config_version": "observation_policy_v1",
+        "format_constraints": true,
+        "retain_visual_details": true,
+        "prompt_version": "structured_visual_v11a_format_details",
+        "schema_version": "visual_observation_v1",
+        "query_builder_version": "objects_visible_text_ascii_v1"
+      },
+      "branches": {
+        "baseline": {
+          "successful": 2,
+          "attempts": 2
+        },
+        "structured": {
+          "successful": 2,
+          "attempts": 2
+        }
+      },
+      "resume_added_attempts": 0
+    }
+  }
+}
