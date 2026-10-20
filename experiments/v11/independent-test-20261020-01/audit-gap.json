@@ -1,0 +1,33 @@
+{
+  "status": "blocked_missing_real_dev_artifacts",
+  "available_dev_input_archive": {
+    "path": "outputs/flickr8k-v11b-dev20-53e41f8-01.tar.gz",
+    "sha256": "c881aa6d7db94f4db5f1ebdcc3753fc02b0ffe1b341a0e6460269533b110c83a",
+    "members": 32,
+    "contains_dev_images_and_metadata": true,
+    "sqlite_members": [],
+    "manifest_members": [],
+    "contains_five_arm_results": false
+  },
+  "local_five_arm_cli": {
+    "path": "outputs/v11a-five-arm-cli-20261020-01",
+    "backend": "mock",
+    "real_dev_evidence": false
+  },
+  "required": [
+    "five real branch manifests",
+    "all five state.sqlite3 databases",
+    "all numbered summaries and exports",
+    "raw model responses including failures",
+    "input snapshots and run logs"
+  ],
+  "not_substituted": [
+    "user summary numbers",
+    "V1.0 diagnostic test results",
+    "Mock outputs"
+  ],
+  "test_rankings_read": false,
+  "gpu_inference_started": false,
+  "test_images_downloaded_this_task": 0,
+  "test_images_to_acquire": 100
+}

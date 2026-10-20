@@ -66,9 +66,11 @@ def check_image(path: Path) -> None:
 
 
 def download_subset(*, output: Path, split: str = "test", limit: int = 20,
-                    revision: str | None = None, resume: bool = False) -> dict:
-    if split not in SPLITS or type(limit) is not int or limit <= 0:
-        raise ValueError("choose an original split and a positive image limit")
+                    revision: str | None = None, resume: bool = False,
+                    offset: int = 0) -> dict:
+    if (split not in SPLITS or type(limit) is not int or limit <= 0
+            or type(offset) is not int or offset < 0):
+        raise ValueError("choose an original split, positive image limit and nonnegative offset")
     output = Path(output)
     if resume:
         source = json.loads((output / "source.json").read_text(encoding="utf-8"))
@@ -101,14 +103,15 @@ def download_subset(*, output: Path, split: str = "test", limit: int = 20,
             if sha256(output / relative) != info["sha256"]:
                 raise ValueError(f"source metadata changed: {relative}")
         rows = rows_for_split(output, split)
-        if limit > len(rows):
-            raise ValueError(f"requested {limit} images but {split} has only {len(rows)}; do not mix original splits")
+        if offset + limit > len(rows):
+            raise ValueError(f"requested offset {offset} + {limit} images but {split} has only {len(rows)}; do not mix original splits")
         inventory_path = output / "image-inventory.json"
         inventory = json.loads(inventory_path.read_text(encoding="utf-8")) if inventory_path.exists() else {}
         receipt = {"started_utc": now(), "repository": REPO, "revision": revision, "split": split,
-                   "selection": "first N filenames in ascending ASCII order, independent of captions and scores",
+                   "selection": "ascending ASCII filenames [offset:offset+limit], independent of captions and scores",
+                   "offset": offset,
                    "limit": limit, "downloaded": 0, "cache_hits": 0, "errors": [], "image_bytes_downloaded": 0}
-        for row in rows[:limit]:
+        for row in rows[offset:offset + limit]:
             relative = f"{split}/{row['file_name']}"
             path = output / relative
             try:
@@ -227,10 +230,11 @@ def adapt_flickr8k(*, input_root: Path, output: Path, revision: str | None = Non
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    download = commands.add_parser("download", help="Fetch split metadata and only the first N images")
+    download = commands.add_parser("download", help="Fetch split metadata and a fixed filename slice")
     download.add_argument("--output", type=Path, required=True)
     download.add_argument("--split", choices=SPLITS, default="test")
     download.add_argument("--limit", type=int, default=20)
+    download.add_argument("--offset", type=int, default=0, help="Zero-based offset in ascending original filenames")
     download.add_argument("--revision")
     download.add_argument("--resume", action="store_true")
     adapt = commands.add_parser("adapt", help="Offline import of train/dev/test imagefolder metadata")

@@ -1,0 +1,35 @@
+{
+  "interpreter": ".venv/Scripts/python.exe",
+  "focused": {
+    "command": "python -m pytest tests/test_v11_audit.py tests/test_caption_pair.py tests/test_flickr8k.py -q --basetemp outputs/pytest-v11-freeze-focused-02",
+    "passed": 17
+  },
+  "full_initial": {
+    "passed": 421,
+    "failed": 4,
+    "cause": "Git dubious ownership in pre-existing provenance code"
+  },
+  "full": {
+    "command": "python -m pytest -q --basetemp outputs/pytest-v11-freeze-full-02 --junitxml outputs/pytest-v11-freeze-full-02.xml",
+    "passed": 426,
+    "failed": 0,
+    "seconds": 58.14,
+    "process_environment": {
+      "GIT_CONFIG_COUNT": "1",
+      "GIT_CONFIG_KEY_0": "safe.directory",
+      "GIT_CONFIG_VALUE_0": "D:/Research/VisionEvidence-Agent"
+    },
+    "global_git_configuration_changed": false
+  },
+  "after_audit_source_pin_update": {
+    "command": "python -m pytest tests/test_v11_audit.py -q --basetemp outputs/pytest-v11-freeze-gates-01",
+    "passed": 2
+  },
+  "pytest_xml_sha256": "215359f6604fa624a13936c7e984dd68ce612f6db40b3c27e3b2dcac50eeaa38",
+  "real_dev_success_path_validated": false,
+  "reason": "raw real results absent",
+  "test_evaluation_executed": false,
+  "gpu_inference_executed": false,
+  "downloader_help_verified": true,
+  "download_offset_default": 0
+}

@@ -125,3 +125,30 @@ def test_offline_source_fingerprint_is_checked(tmp_path):
                                                 "files": {"test/metadata.csv": {"sha256": "0" * 64}}}))
     with pytest.raises(ValueError, match="fingerprint"):
         flickr8k.adapt_flickr8k(input_root=raw, output=tmp_path / "out")
+
+
+def test_offset_download_fetches_only_fixed_slice_and_resumes(tmp_path, monkeypatch):
+    original = make_raw(tmp_path, images=False)
+    jpeg = io.BytesIO()
+    Image.new("RGB", (32, 32), "white").save(jpeg, format="JPEG")
+    calls = []
+    def fetch(url, maximum):
+        calls.append(url)
+        if url.endswith("README.md"):
+            return b"fixture"
+        if url.endswith("metadata.csv"):
+            return (original / "/".join(url.split("/")[-2:])).read_bytes()
+        return jpeg.getvalue()
+    monkeypatch.setattr(flickr8k, "fetch", fetch)
+    output = tmp_path / "download"
+    receipt = flickr8k.download_subset(output=output, revision="a" * 40, offset=1, limit=1)
+    assert receipt["offset"] == 1 and receipt["downloaded"] == 1
+    assert [url for url in calls if url.endswith(".jpg")] == [
+        "https://huggingface.co/datasets/intro/flickr8k/resolve/" + "a" * 40 + "/test/test_1.jpg"]
+    assert not (output / "test/test_0.jpg").exists()
+    calls.clear()
+    again = flickr8k.download_subset(output=output, offset=1, limit=1, resume=True)
+    assert again["cache_hits"] == 1 and calls == []
+    for offset, limit in ((-1, 1), (True, 1), (2, 1), (1, 2)):
+        with pytest.raises(ValueError):
+            flickr8k.download_subset(output=output, offset=offset, limit=limit, resume=True)

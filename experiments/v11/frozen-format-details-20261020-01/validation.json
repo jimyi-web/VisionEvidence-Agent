@@ -1,0 +1,38 @@
+{
+  "status": "passed",
+  "interpreter": ".venv/Scripts/python.exe",
+  "full_cpu_test_command": "python -m pytest -q --basetemp outputs/pytest-v11-freeze-final-01 --junitxml outputs/pytest-v11-freeze-final-01.xml",
+  "passed": 426,
+  "failed": 0,
+  "elapsed_seconds": 54.96,
+  "process_git_environment": {
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "safe.directory",
+    "GIT_CONFIG_VALUE_0": "D:/Research/VisionEvidence-Agent"
+  },
+  "global_git_config_modified": false,
+  "initial_test_failure": {
+    "passed": 421,
+    "failed": 4,
+    "cause": "existing Git provenance calls rejected repository ownership; resolved by process-only safe.directory"
+  },
+  "real_dev_audit_command": "python scripts/audit_v11_dev.py --run outputs/v11-dev-real-source-01/v11b-dev20-five-arm-01 --raw data/raw/flickr8k-v11b-dev20-01 --archive outputs/v11b-dev20-gpu-results.tar.gz --preliminary outputs/v11-dev-real-source-01/v11b-dev20-v10-control-01 --output outputs/v11-dev-real-audit-03",
+  "real_dev_source_success_path_validated": true,
+  "real_primary_responses": 100,
+  "primary_cpu_ranking_replays": 88,
+  "failed_primary_queries_counted_zero": 12,
+  "preliminary_real_responses": 4,
+  "preliminary_cpu_ranking_replays": 4,
+  "unique_dev_images": 20,
+  "transport_files_verified": 81,
+  "paired_report_validation_command": "python -m visionevidence.evaluation.caption_pair --run outputs/v11-dev-paired-validation-01 --limit 20 --output outputs/v11-dev-paired-report-01.json",
+  "paired_report_validation_split": "dev only, copied baseline and format_details originals; no new inference",
+  "final_freeze_status": "frozen",
+  "images_to_acquire": 100,
+  "test_rankings_read": false,
+  "test_images_downloaded": 0,
+  "gpu_inference_started_this_task": false,
+  "pytest_xml_sha256": "2d7dc4ae904302cc691276f6b5256c1c3ffae5e5e14446face176b1f7e2f1e58",
+  "freeze_manifest_sha256": "3002d9990c5e2df351906e36380e1e043c7787c12c7ec75f0cb96b090e2088d9",
+  "scope": "image_to_caption_retrieval_proxy; not fact verification"
+}

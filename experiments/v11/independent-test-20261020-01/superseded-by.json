@@ -1,0 +1,7 @@
+{
+  "initial_status": "blocked_missing_real_dev_artifacts",
+  "resolved": true,
+  "provided_transport": "outputs/v11b-dev20-gpu-results.tar.gz",
+  "current_formal_freeze": "experiments/v11/frozen-format-details-20261020-01/freeze-manifest.json",
+  "initial_files_are_preparation_history": true
+}

@@ -28,6 +28,7 @@ flowchart LR
 - VERITE 适配器已用官方 CSV 小子集验证；真实图片受机构邮箱申请及条款限制。[数据选择](docs/t05_datasets.md)。
 - Flickr8k V1.0 真实 GPU：20 张独立图片、40 次 Qwen 调用、5,000 条候选描述；Baseline Hit@10=0.65、Structured=0.35，后者有五条失败，当前没有检索提升。[GPU 审计报告](docs/flickr8k_real_gpu_3ec02ca_report.md)。
 - V1.1-A：格式约束与视觉信息保留独立开关、严格失败拒绝、全 attempts 导出和离线 dev/test 队列已实现；只有 CPU/Mock 验收，未宣称真实性能改善。[实现、dev/test 方案、GPU 命令与预算](docs/v11a_implementation_and_protocol.md)。
+- V1.1 正式冻结：已审计五路真实 dev 原件，按预定规则选定 format_details（20/20 成功，dev Hit@10=0.90）；固定原 test 第 21–120 图、精确 offset 下载、哈希校验及配对置信区间已准备，独立 test 尚未运行。[冻结报告、归档与准确运行命令](docs/v11_freeze_and_independent_test.md)。
 
 ## 已有实验与边界
 

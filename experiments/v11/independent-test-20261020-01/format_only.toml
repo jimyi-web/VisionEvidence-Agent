@@ -1,0 +1,4 @@
+[observation]
+config_version = "observation_policy_v1"
+format_constraints = true
+retain_visual_details = false
