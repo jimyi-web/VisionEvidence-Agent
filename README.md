@@ -1,6 +1,6 @@
-# VisionEvidence-Agent · V1.0
+# VisionEvidence-Agent · V1.1
 
-一个轻量、可复现、可审计的多模态证据检索研究基线，面向科研实习申请展示。短期目标：**2026-10-20 前完成 V1.0**；长期目标：**10,000+ 查询的大规模可复现评测**。
+一个轻量、可复现、可审计的多模态证据检索研究基线，面向科研实习申请展示。V1.1 已完成独立 100 图实验、离线审计与正式封存；长期目标：**10,000+ 查询的大规模可复现评测**。
 
 研究问题：将图像的可见对象和文字组织成结构化观察，能否比完整自然语言描述构造更好的证据检索查询？如何保留失败、来源、标注边界和计算成本，使比较可审核？
 
@@ -24,11 +24,13 @@ flowchart LR
 - 严格观察解析：拒绝截断/散文，保留失败原响应；不自动补造字段。
 - BM25：保留文档 ID、来源、原文、分数；独立 qrels 驱动端到端 Recall@K/MRR@K。
 - T05-A：流式 JSONL、稳定 ID、分批调度、SQLite 进度、断点、重试、成功缓存、输入/源码/模型哈希、Commit/环境追踪。
-- CPU/Mock 可本地运行；V1.1-A 新策略尚待独立真实 GPU 评测。
+- CPU/Mock 可本地运行；真实实验与合成接口验收分别记录。
 - VERITE 适配器已用官方 CSV 小子集验证；真实图片受机构邮箱申请及条款限制。[数据选择](docs/t05_datasets.md)。
 - Flickr8k V1.0 真实 GPU：20 张独立图片、40 次 Qwen 调用、5,000 条候选描述；Baseline Hit@10=0.65、Structured=0.35，后者有五条失败，当前没有检索提升。[GPU 审计报告](docs/flickr8k_real_gpu_3ec02ca_report.md)。
-- V1.1-A：格式约束与视觉信息保留独立开关、严格失败拒绝、全 attempts 导出和离线 dev/test 队列已实现；只有 CPU/Mock 验收，未宣称真实性能改善。[实现、dev/test 方案、GPU 命令与预算](docs/v11a_implementation_and_protocol.md)。
-- V1.1 正式冻结：已审计五路真实 dev 原件，按预定规则选定 format_details（20/20 成功，dev Hit@10=0.90）；固定原 test 第 21–120 图、精确 offset 下载、哈希校验及配对置信区间已准备，独立 test 尚未运行。[冻结报告、归档与准确运行命令](docs/v11_freeze_and_independent_test.md)。
+- V1.1-A：格式约束与视觉信息保留独立开关、严格失败拒绝、全 attempts 导出和离线 dev/test 队列已实现。[历史实现与实验方案](docs/v11a_implementation_and_protocol.md)。
+- V1.1 正式冻结：五路真实 dev 各 20 图，按预定规则选定 format_details，dev Hit@10=0.90（Baseline=0.80）。[冻结记录](docs/v11_freeze_and_independent_test.md) 保留当时的准备状态与协议。
+- **V1.1 独立测试已封存**：原 test 第 21–120 图，两路共 200 次已审计真实 VLM 调用。Baseline Hit@10=0.780，format_details=0.720，差值 95% 配对 CI=[−0.170, 0.050]；MRR@10 分别为 0.516579、0.516679。结构化分支 94/100 成功，六次 ValueError 全计零，原始状态保留 incomplete。**开发集优势未在独立测试中稳定复现，不能表述为显著提升，也不能据区间跨零宣称等效。** [正式审计报告](docs/v11_independent100_audit.md)、[封存索引](experiments/v11/independent100-sealed-20261027/seal-index.json)。
+- V2.0 目前只有 [研究方案](docs/v20_research_plan.md)：固定查询比较 BM25、Dense、Hybrid；尚未实现或运行新实验。
 
 ## 已有实验与边界
 
@@ -44,6 +46,8 @@ flowchart LR
 | Flickr8k 真实 JPEG + Mock | 5,000 条候选描述 | 20 图片查询/路，共 40 查询槽位 | 0 | 20 张真实图已解码；本行 Mock 不提供视觉质量指标 |
 | Flickr8k V1.0 GPU | 5,000 条候选描述 | 20 图片查询/路，40 槽位 | 40 次，独立图 20 张 | Structured 15/20 成功，Hit@10=0.35，弱于 Baseline 0.65；失败计零 |
 | V1.1-A 合成 CPU/Mock | 10 条合成描述 | 合成 dev 两图，四种配对消融及续跑 | 0 | 验证接口、严格拒绝、缓存和来源，不代表检索改善 |
+| V1.1 五路真实 dev | 5,000 条候选描述/路 | 20 图片查询/路，100 槽位 | 100 次，独立图 20 张 | format_details 20/20 成功，Hit@10=0.90；只用于策略选择，早期另有4次重叠图片 Smoke 单独归档 |
+| V1.1 独立 test | 5,000 条候选描述/路 | 100 图片查询/路，200 槽位 | 200 次，独立图 100 张 | format_details Hit@10=0.72，Baseline=0.78；六条失败计零，未获得提升证据 |
 
 T04 固定合成集主结果（宏平均 n=9，非空 qrels 的查询失败记零）：
 
@@ -91,21 +95,21 @@ $env:GIT_CONFIG_VALUE_0='D:/Research/VisionEvidence-Agent'
 
 prompt、源码、证据库、配置或模型改变要新目录；成功图片哈希变化拒绝缓存。batch-size 是调度大小，GPU 逐图推理。[输入/qrels/恢复协议与 GPU 小批命令](docs/t05_pipeline.md)、[本轮验收](docs/t05_report.md)。
 
-## 真实数据与 GPU 下一步
+## 真实数据与后续研究
 
-VERITE 图片申请 PENDING 时，当前优先用 Flickr8k 做 **image-to-caption retrieval proxy**。20 张真实 test 图片已经完成 V1.0 GPU 运行及审计，现在仅作诊断集。正确描述只作为检索目标，不进入 VLM prompt。配对 qrels 显式标记 caption_pair_proxy，不用于外部事实核验。V1.1-A 当前完整 CPU 测试 **418 passed**。
+Flickr8k 用于 **image-to-caption retrieval proxy**。此前 20 张 test 图仅作诊断；V1.1 另选 100 张独立 test 图，现已完成并封存。正确 caption 只用于候选库与相关性 qrels，不进入 VLM prompt 或图像生成查询。qrels 显式标记 caption_pair_proxy。封存时相关 CPU 测试 **89 passed**；历史全量测试数量见对应版本的验收记录。
 
 ```powershell
 .\.venv\Scripts\python.exe -m visionevidence.caption_experiment --dataset data/processed/flickr8k-proxy-v1/test --output outputs/flickr8k-mock-new --mode mock --limit 20
 ```
 
-上面的 Mock 命令仅作历史诊断；[V1.0 runbook](docs/flickr8k_runbook.md) 保留历史复现方式。V1.1 按 [新方案](docs/v11a_implementation_and_protocol.md) 在原 dev 前二十图选择策略，冻结方法后评测原 test 第 21–120 图，各自候选库固定为原 split 的 5,000 条描述；不再把 test 前二十图作为独立测试。指标不能称为谣言识别准确率；相似图描述可能相关，五条同图描述也不是独立图片样本。
+上面的 Mock 命令仅作历史诊断；[V1.0 runbook](docs/flickr8k_runbook.md) 保留历史复现方式。V1.1 在 dev 前二十图选择策略，冻结后评测 test 第 21–120 图，各自候选库为原 split 的 5,000 条描述。已暴露的 V1.1 dev/test 不再用于 V2.0 新确认结论；V2.0 新划分与未来预算须在执行前单独冻结。指标不能称为谣言识别准确率；相似图描述可能相关，五条同图描述也不是独立图片样本。
 
 按 [VERITE 元数据步骤](docs/t05_datasets.md) 接入，再经 [官方 HF](https://huggingface.co/datasets/stefpapad/VERITE) 申请图片；保留图片哈希与条款。当前官方 CSV 和论文总数差 1 条，适配器按实际字节原样保留。
 
-图文配对标签**不是检索 qrels**；模型生成不是人工核验事实。没有独立相关性标注时指标 null。真实语料需独立准备，不能把正确 caption 塞入证据库制造高分。
+VERITE 图文配对真假标签不能直接作为检索 qrels；Flickr8k 同图 caption 可构成明确标记的关联代理 qrels，不能据此评价真实事实核验。外部证据检索需要独立相关性标注，最终核验还需要事实标签与证据出处。
 
-开发者在已有批准的 GPU 环境中手动运行 [12 条命令](docs/t05_pipeline.md)，先检查 JSON 成功率和成本再扩大规模。本轮不启动 AutoDL、不下载模型权重。万级 GPU、真实检索标注和最终 verifier 留待后续。
+历史 GPU 命令保留作复现资料。V1.1 原件只读封存；本次封存不新增 GPU 或模型调用。未来 V2.0 实现、权重获取和新实验须分别进入后续任务与预算审批，万级 GPU、真实检索标注及最终 verifier 仍待研究。
 
 ## 历史复现与导航
 

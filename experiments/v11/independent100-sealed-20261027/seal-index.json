@@ -1,0 +1,267 @@
+{
+  "record_version": "v11_independent100_seal_v1",
+  "sealed_on": "2026-10-27",
+  "status": "sealed_with_provenance_limits",
+  "experiment_commit": "8428c626a7ba55bb723a0e1506889a04595c1307",
+  "sealing_commit_resolution": "git log -1 --format=%H -- experiments/v11/independent100-sealed-20261027/seal-index.json",
+  "task": "image_to_caption_retrieval_proxy",
+  "is_fact_verification": false,
+  "selected_strategy": "format_details",
+  "strategy_reselected": false,
+  "query_images": 100,
+  "query_slots_per_arm": 100,
+  "candidate_caption_documents_per_arm": 5000,
+  "recorded_real_vlm_calls": 200,
+  "new_vlm_calls_during_sealing": 0,
+  "failure_policy": "All 100 selected images per arm; failed queries score zero; no replacements or retries.",
+  "conclusion": "Dev advantage did not stably reproduce on independent test. No evidence of improvement; confidence intervals include zero, not equivalence.",
+  "branches": {
+    "baseline": {
+      "metrics": {
+        "Hit@1": 0.4,
+        "Hit@5": 0.65,
+        "Hit@10": 0.78,
+        "Recall@10": 0.308,
+        "MRR@10": 0.5165793650793651
+      },
+      "completed": 100,
+      "failed": 0,
+      "real_calls": 100,
+      "original_schema_successes": null,
+      "format_contract_successes": null
+    },
+    "structured": {
+      "metrics": {
+        "Hit@1": 0.42,
+        "Hit@5": 0.68,
+        "Hit@10": 0.72,
+        "Recall@10": 0.322,
+        "MRR@10": 0.5166785714285714
+      },
+      "completed": 94,
+      "failed": 6,
+      "real_calls": 100,
+      "original_schema_successes": 100,
+      "format_contract_successes": 94
+    }
+  },
+  "paired_difference_ci95": {
+    "Hit@1": {
+      "difference": 0.02,
+      "lower": -0.09,
+      "upper": 0.14,
+      "wins": 18,
+      "ties": 66,
+      "losses": 16
+    },
+    "Hit@5": {
+      "difference": 0.03,
+      "lower": -0.09,
+      "upper": 0.15,
+      "wins": 19,
+      "ties": 65,
+      "losses": 16
+    },
+    "Hit@10": {
+      "difference": -0.06,
+      "lower": -0.17,
+      "upper": 0.05,
+      "wins": 13,
+      "ties": 68,
+      "losses": 19
+    },
+    "Recall@10": {
+      "difference": 0.013999999999999999,
+      "lower": -0.04800000000000001,
+      "upper": 0.076,
+      "wins": 40,
+      "ties": 23,
+      "losses": 37
+    },
+    "MRR@10": {
+      "difference": 9.920634920634747e-05,
+      "lower": -0.09811140873015874,
+      "upper": 0.09782142857142856,
+      "wins": 34,
+      "ties": 36,
+      "losses": 30
+    }
+  },
+  "bootstrap": {
+    "method": "paired image bootstrap percentile",
+    "repetitions": 20000,
+    "seed": 0,
+    "unit": "one image pair, including failures",
+    "quantiles": [
+      0.025,
+      0.975
+    ],
+    "interpolation": "linear",
+    "direction": "format_details minus baseline",
+    "generator": "Python random.Random(0).choices",
+    "shared_resamples_across_metrics": true,
+    "primary_preregistered": "Hit@10",
+    "additional_requested_descriptive_intervals": [
+      "Hit@1",
+      "Hit@5",
+      "Recall@10",
+      "MRR@10"
+    ],
+    "multiplicity_adjusted": false
+  },
+  "six_failures": [
+    {
+      "arm": "structured",
+      "sample_id": "flickr8k:1258913059_07c613f7ff.jpg",
+      "attempt_id": 1,
+      "error_type": "ValueError",
+      "error": "v11 format: visible_text must contain at most 2 items",
+      "category": "format_contract",
+      "all_contract_violations": [
+        "visible_text: 3 > 2",
+        "uncertainties: 3 > 2"
+      ],
+      "raw_description_sha256": "8b79caa7491364ad0aaed8c580e2d54901878f9e091e6925824e76c69581d7e6"
+    },
+    {
+      "arm": "structured",
+      "sample_id": "flickr8k:1329832826_432538d331.jpg",
+      "attempt_id": 14,
+      "error_type": "ValueError",
+      "error": "v11 format: visible_text must contain at most 2 items",
+      "category": "format_contract",
+      "all_contract_violations": [
+        "visible_text: 4 > 2"
+      ],
+      "raw_description_sha256": "803225b3af5d051dcb1a856a3688261a356e3fd4944dc005be9c24e46bf4efa2"
+    },
+    {
+      "arm": "structured",
+      "sample_id": "flickr8k:1417031097_ab656bc4bd.jpg",
+      "attempt_id": 34,
+      "error_type": "ValueError",
+      "error": "v11 format: visible_text must contain at most 2 items",
+      "category": "format_contract",
+      "all_contract_violations": [
+        "visible_text: 3 > 2"
+      ],
+      "raw_description_sha256": "3b4e51b1c6429dc230abcdbb146756466a4c55ca02d311594ad8bb8cdb6a3bed"
+    },
+    {
+      "arm": "structured",
+      "sample_id": "flickr8k:1461667284_041c8a2475.jpg",
+      "attempt_id": 42,
+      "error_type": "ValueError",
+      "error": "v11 format: objects must contain at most 6 items",
+      "category": "format_contract",
+      "all_contract_violations": [
+        "objects: 7 > 6"
+      ],
+      "raw_description_sha256": "6d10de66f92a4eee6f8be7a042b0a0969a2e76c48681403eee0a8f1bd3b6723a"
+    },
+    {
+      "arm": "structured",
+      "sample_id": "flickr8k:1472882567_33dc14c8b6.jpg",
+      "attempt_id": 45,
+      "error_type": "ValueError",
+      "error": "v11 format: objects must contain at most 6 items",
+      "category": "format_contract",
+      "all_contract_violations": [
+        "objects: 8 > 6"
+      ],
+      "raw_description_sha256": "10978c6a194caa5b610c53fefa637b560015bf4a064deac84608c96d505e0c81"
+    },
+    {
+      "arm": "structured",
+      "sample_id": "flickr8k:2041867793_552819a40b.jpg",
+      "attempt_id": 90,
+      "error_type": "ValueError",
+      "error": "v11 format: visible_text must contain at most 2 items",
+      "category": "format_contract",
+      "all_contract_violations": [
+        "visible_text: 3 > 2"
+      ],
+      "raw_description_sha256": "c30d7de27e5fd99b26ffa17e875bf24f1382942e18b5ded8b8ea7a9f0850856c"
+    }
+  ],
+  "input_archive_sha256": {
+    "outputs/v11-independent100-audit-transfer.gFF0L3/raw-artifacts.tar.gz": "04606e894bc82d0f538469275d13d638171c2137c2bdb6bf9546ecb19e9a740f",
+    "outputs/flickr8k-v11-test-100.tar.gz": "9870fc2f64a3dd1b2aa5fcea35b5c405d9a94a14e62014568b7b046748ca5f70"
+  },
+  "extracted_original_file_sha256": {
+    "data/processed/flickr8k-v11-heldout100-01/manifest.json": "b6ed8120b0c3ae6918b326ee712d5fad3125ddc1e83f4b921ceca659816e7060",
+    "data/processed/flickr8k-v11-heldout100-01/test/captions.jsonl": "483b0e1de3bf3fc18f3e26aaee57fedebb06416cdd2679966c47c7db927ee781",
+    "data/processed/flickr8k-v11-heldout100-01/test/corpus.jsonl": "2b6007f1ffd51d40f31bc123b624e3d7aa9344ca3e0404a5691e264ae8cbd599",
+    "data/processed/flickr8k-v11-heldout100-01/test/qrels.jsonl": "24bf1beb2e4be453558812a5f24da19fc63d71f4b4e6d7d7f9bb8d1efcea334d",
+    "data/processed/flickr8k-v11-heldout100-01/test/samples.jsonl": "78716bae5d6c04909fb693c3ea9a86f6e81127c05e56f02abcc03a8ac8444e1c",
+    "experiments/v11/frozen-format-details-20261020-01/baseline-prompt.txt": "213467c3d77c93d83cfeae8e4ffd9a7854fc67dcee6fb3d4691a601fc2566351",
+    "experiments/v11/frozen-format-details-20261020-01/details_only.toml": "c29374aa7e4f9cb8bcc5ebb37c5554ae5d87fd708baa84b412e46c18e369963a",
+    "experiments/v11/frozen-format-details-20261020-01/dev-audit.json": "25eb7979cb9934264f9b19dfdbce89bdba8cd184fe8ced6a8dcb74ad365bd17e",
+    "experiments/v11/frozen-format-details-20261020-01/format_details-prompt.txt": "d0fb6500ad20e895b95a20beadf8a8e085f95a97080b86e7fb7764d76325afbd",
+    "experiments/v11/frozen-format-details-20261020-01/format_details.toml": "ea1f343101d30f7d474e2862d5f59168e766e38d4563577a2eef96bc5f302278",
+    "experiments/v11/frozen-format-details-20261020-01/format_only.toml": "caf6cafa704ce26ac32aff0d0c58b5f24f7acad35e70621271cdbc5255619f35",
+    "experiments/v11/frozen-format-details-20261020-01/freeze-manifest.json": "3002d9990c5e2df351906e36380e1e043c7787c12c7ec75f0cb96b090e2088d9",
+    "experiments/v11/frozen-format-details-20261020-01/pytest.xml": "2d7dc4ae904302cc691276f6b5256c1c3ffae5e5e14446face176b1f7e2f1e58",
+    "experiments/v11/frozen-format-details-20261020-01/v10_control.toml": "9e9479756022f637d66831f7744f27a3f8d53d81fe0db9df4c46704c67d10529",
+    "experiments/v11/frozen-format-details-20261020-01/validation.json": "45dd86e0e662dfd7cf6c5b974ef82b6fac39be7b5f78509a3e9ae1f6b9e6ef79",
+    "outputs/flickr8k-v11-independent100-01/.experiment.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "outputs/flickr8k-v11-independent100-01/baseline/.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "outputs/flickr8k-v11-independent100-01/baseline/attempts-0001.jsonl": "7f625012a5f389fe2a00830da584e65153a8dc23ebefd0c6a4581a70a15c9cb6",
+    "outputs/flickr8k-v11-independent100-01/baseline/attempts-0002.jsonl": "cfb749e35634ff3093fdf80c5dbf362b545d433f4f87165ab8969c18ce573327",
+    "outputs/flickr8k-v11-independent100-01/baseline/input-corpus.jsonl": "2b6007f1ffd51d40f31bc123b624e3d7aa9344ca3e0404a5691e264ae8cbd599",
+    "outputs/flickr8k-v11-independent100-01/baseline/input-qrels.jsonl": "24bf1beb2e4be453558812a5f24da19fc63d71f4b4e6d7d7f9bb8d1efcea334d",
+    "outputs/flickr8k-v11-independent100-01/baseline/input-samples.jsonl": "78716bae5d6c04909fb693c3ea9a86f6e81127c05e56f02abcc03a8ac8444e1c",
+    "outputs/flickr8k-v11-independent100-01/baseline/manifest.json": "6c92dc3e2862770bc02c1e63cd6e8ee3f7e51cd64e377b35600e62b2d483cdc7",
+    "outputs/flickr8k-v11-independent100-01/baseline/results-0001.jsonl": "ce357d9d5b7d4f3fb32de7e16558ae1f40700fa4d15b83b92b103b5be8a699d3",
+    "outputs/flickr8k-v11-independent100-01/baseline/results-0002.jsonl": "170838f47d378024e5a0ce650d035c35e7ad6c9effaa93b3f75ba4974c817ea1",
+    "outputs/flickr8k-v11-independent100-01/baseline/runtime-0001.json": "c2ccffaad6bcdec5de70266c42920a82931ca1b9bb69f2fc2abbae4667d922d1",
+    "outputs/flickr8k-v11-independent100-01/baseline/runtime-0002.json": "c2ccffaad6bcdec5de70266c42920a82931ca1b9bb69f2fc2abbae4667d922d1",
+    "outputs/flickr8k-v11-independent100-01/baseline/state.sqlite3": "0c8fd5d7e97e8581822e5280ec9a9bcbad4bbad0f5298db5600d797d4563e5f8",
+    "outputs/flickr8k-v11-independent100-01/baseline/summary-0001.json": "83ae9df1ba37bafa41e2ff60b27cb685d3ffd41f388e3edb4fbe0381f8029247",
+    "outputs/flickr8k-v11-independent100-01/baseline/summary-0002.json": "c6dbd761a25c4b765753a55206cbe25d0d9d7039df71f281c226a1f2cddb0eb1",
+    "outputs/flickr8k-v11-independent100-01/comparison-0001.json": "3006518dad30bd74e347a1b5a19579833f31286f700465a9dabbbeef13b8cd8f",
+    "outputs/flickr8k-v11-independent100-01/comparison-0002.json": "c43ccb15b98b7b583cb8c3ff2f8b42056f1671e1e78c21b53bf83c316d0042e4",
+    "outputs/flickr8k-v11-independent100-01/experiment.json": "a5ff980ee27ddbd6d5bc2a458415c064cbe29edb863058e0a7390c85558f953b",
+    "outputs/flickr8k-v11-independent100-01/structured/.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "outputs/flickr8k-v11-independent100-01/structured/attempts-0001.jsonl": "482520b814238d902c1e82501c81a9528f588c46017c4e9d5b8c4475e56fb1db",
+    "outputs/flickr8k-v11-independent100-01/structured/attempts-0002.jsonl": "146255d507b5394ec629032a6475c27efeb175a3f18be666a7b609d7c8d8c277",
+    "outputs/flickr8k-v11-independent100-01/structured/input-corpus.jsonl": "2b6007f1ffd51d40f31bc123b624e3d7aa9344ca3e0404a5691e264ae8cbd599",
+    "outputs/flickr8k-v11-independent100-01/structured/input-qrels.jsonl": "24bf1beb2e4be453558812a5f24da19fc63d71f4b4e6d7d7f9bb8d1efcea334d",
+    "outputs/flickr8k-v11-independent100-01/structured/input-samples.jsonl": "78716bae5d6c04909fb693c3ea9a86f6e81127c05e56f02abcc03a8ac8444e1c",
+    "outputs/flickr8k-v11-independent100-01/structured/manifest.json": "c41407c2d93506d21146f5861564e5ab0279b36906ed488561386e67f0a04fd1",
+    "outputs/flickr8k-v11-independent100-01/structured/results-0001.jsonl": "2c3e17ab444622b92e78f74bde991a59ded94f3b479eec11735eb19b3728bd55",
+    "outputs/flickr8k-v11-independent100-01/structured/results-0002.jsonl": "ca4a4804fe1427897eaa2988ddb81dd97c4f139496858c36cf26dc28e96591ba",
+    "outputs/flickr8k-v11-independent100-01/structured/runtime-0001.json": "c2ccffaad6bcdec5de70266c42920a82931ca1b9bb69f2fc2abbae4667d922d1",
+    "outputs/flickr8k-v11-independent100-01/structured/runtime-0002.json": "c2ccffaad6bcdec5de70266c42920a82931ca1b9bb69f2fc2abbae4667d922d1",
+    "outputs/flickr8k-v11-independent100-01/structured/state.sqlite3": "3e55183dfadd37fadf75d06f97219a08c34b77ecb57248a013c4b98da2e3798d",
+    "outputs/flickr8k-v11-independent100-01/structured/summary-0001.json": "0ead982f237c22b574e7b655f9c7f3fffd77a61b2e8c8e63433064da294bb973",
+    "outputs/flickr8k-v11-independent100-01/structured/summary-0002.json": "8cdf98e6224b3a07a174e2dd27c4eecb90d0c5dae29a32922cdf7f36db1cc73a"
+  },
+  "private_audit_artifact_sha256": {
+    "outputs/v11-independent100-audit-02/audit.json": "53a9cf895732410562ffdc3f36edd835321112a149725c84bda72d67500c360c",
+    "outputs/v11-independent100-audit-02/paired.json": "5e6b64116b1d3c28d3baef1f5d7f75401b604ffdaa22d68c53a3c6a7d5d9417c",
+    "outputs/v11-independent100-audit-02/paired.csv": "45ac2b7547cbc54bda8753bc843c4f323fb393c3ce434d903fb6616afcb3a5de",
+    "outputs/v11-independent100-audit-02/failures.json": "d0c52d8b3c9c035734c661600d722c947f11992a514a0db0c9f3b582984aca02",
+    "outputs/v11-independent100-audit-02/report.md": "71f7a4cc836fe783d09db263bfbc68abe5e6af81f4c011d268ec2dcd636033d3"
+  },
+  "audit_script_sha256": "b7988e20d954891211bed1d43fe40d1e5d68ee912728540b221f6daf464405f7",
+  "audit_script_hash_convention": "exact local bytes at audit; Git may normalize line endings, use the frozen audit copy hash when verifying originals",
+  "validation": {
+    "cpu_tests_passed": 89,
+    "cpu_tests_failed": 0,
+    "junit_path": "outputs/pytest-v11-seal-01.xml",
+    "junit_sha256": "e868f1b158db7da530867dc766b8d08ebafc8afa2c29331a1a5f796d7ac8e70d",
+    "full_audit_rerun": "outputs/v11-independent100-seal-recheck-01",
+    "all_five_output_files_byte_identical_to_audit02": true,
+    "report_metric_rows_verified": 5
+  },
+  "source_limits": [
+    "Transport raw directory is only an external symlink; images and metadata verified against separate existing image archive.",
+    "No console logs supplied; exact shell invocation, wrapper preflight and absence of out-of-directory runs are not independently proven.",
+    "200 internally consistent recorded real-backend calls; not independent hardware attestation. Model hashes are recorded, weights not rehashed offline.",
+    "Fixed ASCII-order cohort, correlated captions, assumed negatives, possible pretraining exposure; no population-wide or factual-verification claim."
+  ],
+  "raw_artifacts_committed": false,
+  "private_artifact_policy": "Retain local original archives, SQLite, images and raw responses under ignored outputs/data; index contains hashes and compact derived records only.",
+  "v20_status": "Research plan only; no implementation or new experimental calls."
+}
